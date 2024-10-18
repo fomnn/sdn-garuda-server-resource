@@ -1,11 +1,11 @@
 import { Hono } from "hono"
-import { Subject } from "../db/schemas/subject-schema"
+// import { Subject } from "../db/schemas/subject-schema"
 
 const subjectRouter = new Hono()
 
 subjectRouter.get('/', async (c) => {
-  const subject = await Subject.find()
-  return c.json(subject)
+  // const subject = await Subject.find()
+  // return c.json(subject)
 })
 
 subjectRouter.post('/', async (c) => {
@@ -14,10 +14,10 @@ subjectRouter.post('/', async (c) => {
     grade
   } = await c.req.json()
   
-  await Subject.create({
-    subject_name,
-    grade
-  })
+  // await Subject.create({
+  //   subject_name,
+  //   grade
+  // })
 
   return c.json({ success: true })
 })

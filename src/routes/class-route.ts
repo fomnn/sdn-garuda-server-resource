@@ -1,11 +1,11 @@
 import { Hono } from "hono"
-import { Class } from "../db/schemas/class-schema"
+// import { Class } from "../db/schemas/class-schema"
 
 const classRouter = new Hono()
 
 classRouter.get('/', async (c) => {
-  const class2 = await Class.find()
-  return c.json(class2)
+  // const class2 = await Class.find()
+  // return c.json(class2)
 })
 
 classRouter.post('/', async (c) => {
@@ -15,11 +15,11 @@ classRouter.post('/', async (c) => {
     teacher_id,
   } = await c.req.json()
 
-  await Class.create({
-    class_name,
-    teacher_id,
-    students: []
-  })
+  // await Class.create({
+  //   class_name,
+  //   teacher_id,
+  //   students: []
+  // })
 
   return c.json({ message: "success" })
 })

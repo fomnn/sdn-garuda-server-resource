@@ -6,7 +6,6 @@ import classRouter from "./routes/class-route"
 import { cors } from "hono/cors"
 import subjectRouter from "./routes/subject-route"
 import xlsx from 'node-xlsx';
-import { Parent } from "./db/schemas/parent-schema"
 import { ParentInterface } from "./types/Parent"
 import checkIfAnyDataUndefined from "./utils/check-if-any-data-undefined"
 // import tes from './assets/excel/tes.xlsx'
@@ -46,7 +45,7 @@ app.post('/tes', async (c) => {
       continue
     }
     // console.log(parent)
-    await Parent.create(parent)
+    // await Parent.create(parent)
   }
 
   
