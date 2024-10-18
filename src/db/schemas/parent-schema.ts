@@ -1,20 +1,17 @@
-import { model, Schema } from "mongoose"
+import mongoose from "mongoose"
 
-const parentsSchema = new Schema({
-  first_name: String,
-  middle_name: String,
-  last_name: String,
-  contact_number: { type: String, unique: true },
-  email: String,
-  gender: { type: String, enum: ["male", "female"] },
-  address: String,
-  occupation: String,
-  children: [
-    {
-      student_id: String,
-      relationship: { type: String, enum: ['father', 'mother', 'guardian'] }
-    },
-  ]
+if (mongoose.models.parents) {
+  console.log(mongoose.models.parents)
+  delete mongoose.models.parents
+}
+
+const parentsSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  tahun_lahir: {type: Number, default: null},
+  jenjang_pendidikan: {type: String, required: true },
+  pekerjaan: {type: String, required: true },
+  penghasilan: {type: String, required: true },
+  NIK: { type: String, required: true },
 })
 
-export const Parent = model("parents", parentsSchema)
+export const Parent = mongoose.model("parents", parentsSchema)

@@ -6,8 +6,10 @@
   "dependencies": {
     "@hono/node-server": "^1.13.1",
     "dotenv": "^16.4.5",
+    "exceljs": "^4.4.0",
     "hono": "^4.6.3",
-    "mongoose": "^8.7.0"
+    "mongoose": "^8.7.0",
+    "node-xlsx": "^0.24.0"
   },
   "devDependencies": {
     "@types/node": "^20.16.11",
