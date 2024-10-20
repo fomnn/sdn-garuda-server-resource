@@ -3,32 +3,22 @@ import { Hono } from "hono"
 
 const teacherRouter = new Hono()
 
-teacherRouter.get('/', async (c) => {
-  // const teacher = await Teacher.find()
-  // return c.json(teacher)
-})
+teacherRouter
+  .get('/', async (c) => {
+    // const teacher = await Teacher.find()
+    // return c.json(teacher)
+  })
+  .post('/', async (c) => {
+    const {
+      first_name,
+      middle_name,
+      last_name,
+      email,
+      role,
+      gender,
+      contact_number
+    } = await c.req.json()
 
-teacherRouter.post('/', async (c) => {
-  const {
-    first_name,
-    middle_name,
-    last_name,
-    email,
-    role,
-    gender,
-    contact_number
-  } = await c.req.json()
-
-  // await Teacher.create({
-  //   first_name,
-  //   middle_name,
-  //   last_name,
-  //   email,
-  //   role,
-  //   gender,
-  //   contact_number,
-  // })
-
-  return c.json({ message: "success" })
-})
+    return c.json({ message: "success" })
+  })
 export default teacherRouter

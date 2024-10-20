@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,7 +7,159 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model users {
-  id String @id @db.Uuid() @default(uuid())
-  name String
+model attendance {
+  id         Int                @id @default(autoincrement())
+  student_id Int                @default(autoincrement())
+  class_id   Int                @default(autoincrement())
+  date       DateTime?          @db.Date
+  status     attendance_status?
+  classes    classes            @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  students   students           @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model class_subjects {
+  class_id   Int      @default(autoincrement())
+  subject_id Int      @default(autoincrement())
+  classes    classes  @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subjects   subjects @relation(fields: [subject_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([class_id, subject_id])
+}
+
+model classes {
+  id             Int              @id @default(autoincrement())
+  class_name     String
+  teacher_id     Int              @default(autoincrement())
+  attendance     attendance[]
+  class_subjects class_subjects[]
+  teachers       teachers         @relation(fields: [teacher_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model feedbacks {
+  id            Int      @id @default(autoincrement())
+  feedback_text String
+  rating        Int
+  date          DateTime @db.Date
+  teacher_id    Int      @default(autoincrement())
+  parent_id     Int      @default(autoincrement())
+  parents       parents  @relation(fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  teachers      teachers @relation(fields: [teacher_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model parents {
+  id                 Int                @id @default(autoincrement())
+  nama               String
+  tahun_lahir        Int?
+  jenjang_pendidikan String
+  pekerjaan          String
+  penghasilan        String
+  NIK                String
+  feedbacks          feedbacks[]
+  parents_students   parents_students[]
+}
+
+model parents_students {
+  parent_id    Int                           @default(autoincrement())
+  student_id   Int                           @default(autoincrement())
+  relationship parent_student_relationships?
+  parents      parents                       @relation(fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  students     students                      @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([parent_id, student_id])
+}
+
+model pricipals {
+  id             Int    @id @default(autoincrement())
+  nama           String
+  email          String
+  contact_number String
+}
+
+model student_grades {
+  id         Int      @id @default(autoincrement())
+  student_id Int      @default(autoincrement())
+  subject_id Int      @default(autoincrement())
+  grade      Float
+  term       String
+  students   students @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subjects   subjects @relation(fields: [subject_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model students {
+  id               Int                @id @default(autoincrement())
+  nama             String
+  jenis_kelamin    jenis_kelamin
+  NISN             String
+  attendance       attendance[]
+  parents_students parents_students[]
+  student_grades   student_grades[]
+}
+
+model subject_teachers {
+  subject_id Int      @default(autoincrement())
+  teacher_id Int      @default(autoincrement())
+  subjects   subjects @relation(fields: [subject_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  teachers   teachers @relation(fields: [teacher_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([subject_id, teacher_id])
+}
+
+model subjects {
+  id               Int                @id @default(autoincrement())
+  subject_name     String
+  class_subjects   class_subjects[]
+  student_grades   student_grades[]
+  subject_teachers subject_teachers[]
+}
+
+model teachers {
+  id               Int                @id @default(autoincrement())
+  nama             String
+  jenis_kelamin    jenis_kelamin
+  NIP              String?
+  classes          classes[]
+  feedbacks        feedbacks[]
+  subject_teachers subject_teachers[]
+}
+
+enum agama {
+  Islam
+  Kristen
+  Katolik
+  Hindu
+  Buddha
+}
+
+enum attendance_status {
+  present
+  absent
+  excused
+}
+
+enum jenis_kelamin {
+  male
+  female
+}
+
+enum jenis_tinggal {
+  Bersama_Orang_Tua @map("Bersama Orang Tua")
+  Lainnya
+}
+
+enum parent_student_relationships {
+  father
+  mother
+  guardian
+}
+
+enum status_kepegawaian {
+  PNS
+  Guru_Honor_Sekolah @map("Guru Honor Sekolah")
+  GTY_PTY            @map("GTY/PTY")
+  PPPK
+}
+
+enum teacher_roles {
+  teacher
+  staff
 }

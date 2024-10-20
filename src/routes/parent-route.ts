@@ -1,51 +1,49 @@
 import { Hono } from "hono"
+import { prisma } from "../../prisma/db"
 // import { Parent } from "../db/schemas/parent-schema"
 
 const parentRouter = new Hono()
 
-parentRouter.get('/', async (c) => {
-  // const parent = await Parent.find()
-  // return c.json(parent)
-})
+parentRouter
+  .get('/', async (c) => {
+    const parents = await prisma.parents.findMany()
 
-parentRouter.post('/', async (c) => {
-  const {
-    first_name,
-    middle_name,
-    last_name,
-    contact_number,
-    email,
-    address,
-    gender,
-    occupation,
-  } = await c.req.parseBody() as Record<string, string>
+    return c.json({ parents })
+  })
+  .post('/', async (c) => {
+    const {
+      nama,
+      jenjang_pendidikan,
+      NIK,
+      pekerjaan,
+      tahun_lahir,
+      penghasilan,
+    } = await c.req.parseBody() as Record<string, string>
 
-  // await Parent.create({
-  //   first_name,
-  //   middle_name,
-  //   last_name,
-  //   contact_number,
-  //   email,
-  //   address,
-  //   gender,
-  //   occupation,
-  //   dependents: [
-  //     {
-  //       student_id: 'fasdfadsf',
-  //       relationship: 'father'
-  //     }
-  //   ]
-  // })
+    await prisma.parents.create({
+      data: {
+        nama,
+        jenjang_pendidikan,
+        NIK,
+        pekerjaan,
+        penghasilan,
+        tahun_lahir: Number.parseInt(tahun_lahir),
+      }
+    })
 
-  return c.json({ success: true })
-})
+    return c.json({ success: true })
+  })
+  .get('/:id', async (c) => {
+    const { id } = c.req.param()
 
-parentRouter.get('/:id', async (c) => {
-  const { id } = c.req.param()
+    // const parent = await Parent.findById(id)
+    const parent = await prisma.parents.findUnique({
+      where: {
+        id: Number.parseInt(id),
+      }
+    })
 
-  // const parent = await Parent.findById(id)
-
-  // return c.json(parent)
-})
+    return c.json({ parent })
+  })
 
 export default parentRouter
