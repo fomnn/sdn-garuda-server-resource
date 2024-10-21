@@ -1,4 +1,4 @@
-import { ParentInterface } from "../types/Parent";
+import { ParentInterface } from "@/types/Parent";
 
 export default function checkIfAnyDataUndefined(parent: ParentInterface)  {
   // Loop through all the properties of the object

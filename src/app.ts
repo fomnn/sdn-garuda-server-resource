@@ -20,30 +20,30 @@ app.get('/', (c) => {
 
 app.post('/tes', async (c) => {
 
-  const workSheet = xlsx.parse('src/assets/excel/tes.xlsx')
+  // const workSheet = xlsx.parse('src/assets/excel/tes.xlsx')
 
-  // console.log(workSheet.forEach(l => {
-  //   console.log(l.data)
-  // }))
+  // // console.log(workSheet.forEach(l => {
+  // //   console.log(l.data)
+  // // }))
 
-  const data = workSheet[0].data
+  // const data = workSheet[0].data
 
-  // console.log(data[2][0])
+  // // console.log(data[2][0])
 
-  for (let i = 1; i < data.length; i++) {
-    const parent: ParentInterface = {
-      name: data[i][0],
-      tahun_lahir: data[i][1],
-      jenjang_pendidikan: data[i][2],
-      pekerjaan: data[i][3],
-      penghasilan: data[i][4],
-      NIK: data[i][5],
-    }
+  // for (let i = 1; i < data.length; i++) {
+  //   const parent: ParentInterface = {
+  //     name: data[i][0],
+  //     tahun_lahir: data[i][1],
+  //     jenjang_pendidikan: data[i][2],
+  //     pekerjaan: data[i][3],
+  //     penghasilan: data[i][4],
+  //     NIK: data[i][5],
+  //   }
 
-    if (checkIfAnyDataUndefined(parent)) {
-      continue
-    }    
-  }
+  //   if (checkIfAnyDataUndefined(parent)) {
+  //     continue
+  //   }    
+  // }
 
   
 

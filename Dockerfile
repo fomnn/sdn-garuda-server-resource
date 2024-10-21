@@ -8,7 +8,6 @@ WORKDIR /app
 COPY pnpm-lock.yaml ./
 COPY package.json tsconfig.json ./ 
 COPY src ./ 
-COPY prisma ./prisma
 
 # Install pnpm
 RUN npm install -g pnpm && \
