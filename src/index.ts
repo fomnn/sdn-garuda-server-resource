@@ -1,7 +1,7 @@
 import { serve } from '@hono/node-server'
 // import connectDB from './db/init'
 import dotenv from 'dotenv'
-import app from '@/app'
+import app from './app.js'
 
 async function startServer() {
   dotenv.config()

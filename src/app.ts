@@ -1,13 +1,12 @@
 import { Hono } from "hono"
-import studentRouter from "./routes/student-router"
-import parentRouter from "./routes/parent-router"
-import teacherRouter from "./routes/teacher-router"
-import classRouter from "./routes/class-router"
+import studentRouter from "./routes/student-router.js"
+import parentRouter from "./routes/parent-router.js"
+import teacherRouter from "./routes/teacher-router.js"
+import classRouter from "./routes/class-router.js"
 import { cors } from "hono/cors"
-import subjectRouter from "./routes/subject-router"
+import subjectRouter from "./routes/subject-router.js"
 import xlsx from 'node-xlsx';
-import { ParentInterface } from "./types/Parent"
-import checkIfAnyDataUndefined from "./utils/check-if-any-data-undefined"
+import { ParentInterface } from "./types/Parent.js"
 
 const app = new Hono().basePath('/api')
 
