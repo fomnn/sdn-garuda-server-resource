@@ -1,5 +1,5 @@
 import { Hono } from "hono"
-import { prisma } from "./../prisma/db.js"
+import { prisma } from "../../prisma/db.js"
 // import { Teacher } from "../db/schemas/teacher-schema"
 
 const teacherRouter = new Hono()

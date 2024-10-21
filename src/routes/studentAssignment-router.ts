@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { prisma } from "./../prisma/db.js";
+import { prisma } from "../../prisma/db.js";
 
 const StudentAssignmentRouter = new Hono()
 

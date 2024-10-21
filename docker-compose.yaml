@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  backend:
+    build: .
+    container_name: backend
+    ports:
+      - "3000:3000"  # Sesuaikan dengan port backend kamu
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://sdn-garuda-admin:sdn-garuda-admin@postgres:5432/sdn-garuda
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: sdn-garuda-admin
+      POSTGRES_PASSWORD: sdn-garuda-admin
+      POSTGRES_DB: sdn-garuda
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:

@@ -7,7 +7,9 @@ WORKDIR /app
 
 COPY pnpm-lock.yaml ./
 COPY package.json tsconfig.json ./ 
-COPY src ./ 
+COPY src ./src
+COPY prisma ./prisma 
+
 
 # Install pnpm
 RUN npm install -g pnpm && \
@@ -29,4 +31,4 @@ COPY --from=builder --chown=hono:nodejs /app/pnpm-lock.yaml /app/pnpm-lock.yaml
 USER hono
 EXPOSE 3000
 
-CMD ["node", "/app/dist/index.js"]
+CMD ["node", "/app/dist/src/index.js"]
