@@ -8,8 +8,6 @@ import subjectRouter from "./routes/subject-router"
 import xlsx from 'node-xlsx';
 import { ParentInterface } from "./types/Parent"
 import checkIfAnyDataUndefined from "./utils/check-if-any-data-undefined"
-import { prisma } from "../prisma/db"
-// import tes from './assets/excel/tes.xlsx'
 
 const app = new Hono().basePath('/api')
 

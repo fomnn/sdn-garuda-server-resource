@@ -1,5 +1,5 @@
 import { Hono } from "hono"
-import { prisma } from "../../prisma/db"
+import { prisma } from "./../../prisma/db"
 // import { Parent } from "../db/schemas/parent-schema"
 
 const parentRouter = new Hono()
@@ -45,18 +45,6 @@ parentRouter
     })
 
     return c.json({ success: true })
-  })
-  .get('/:id', async (c) => {
-    const { id } = c.req.param()
-
-    // const parent = await Parent.findById(id)
-    const parent = await prisma.parents.findUnique({
-      where: {
-        id: Number.parseInt(id),
-      }
-    })
-
-    return c.json({ parent })
   })
 
   // DELETE /api/parents/:id
