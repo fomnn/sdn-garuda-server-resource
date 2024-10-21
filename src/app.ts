@@ -1,10 +1,10 @@
 import { Hono } from "hono"
-import studentRouter from "./routes/student-route"
-import parentRouter from "./routes/parent-route"
-import teacherRouter from "./routes/teacher-route"
-import classRouter from "./routes/class-route"
+import studentRouter from "./routes/student-router"
+import parentRouter from "./routes/parent-router"
+import teacherRouter from "./routes/teacher-router"
+import classRouter from "./routes/class-router"
 import { cors } from "hono/cors"
-import subjectRouter from "./routes/subject-route"
+import subjectRouter from "./routes/subject-router"
 import xlsx from 'node-xlsx';
 import { ParentInterface } from "./types/Parent"
 import checkIfAnyDataUndefined from "./utils/check-if-any-data-undefined"
@@ -44,11 +44,7 @@ app.post('/tes', async (c) => {
 
     if (checkIfAnyDataUndefined(parent)) {
       continue
-    }
-    // console.log(parent)
-    // await Parent.create(parent)
-    // await prisma.parents.
-    
+    }    
   }
 
   

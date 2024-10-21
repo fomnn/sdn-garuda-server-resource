@@ -7,19 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model attendance {
-  id         Int                @id @default(autoincrement())
-  student_id Int                @default(autoincrement())
-  class_id   Int                @default(autoincrement())
-  date       DateTime?          @db.Date
-  status     attendance_status?
-  classes    classes            @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  students   students           @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-}
-
 model class_subjects {
-  class_id   Int      @default(autoincrement())
-  subject_id Int      @default(autoincrement())
+  class_id   Int
+  subject_id Int
   classes    classes  @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   subjects   subjects @relation(fields: [subject_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -29,10 +19,10 @@ model class_subjects {
 model classes {
   id             Int              @id @default(autoincrement())
   class_name     String
-  teacher_id     Int              @default(autoincrement())
-  attendance     attendance[]
+  teacher_id     Int?
+  attendance     attendances[]
   class_subjects class_subjects[]
-  teachers       teachers         @relation(fields: [teacher_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  teachers       teachers?        @relation(fields: [teacher_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model feedbacks {
@@ -40,8 +30,8 @@ model feedbacks {
   feedback_text String
   rating        Int
   date          DateTime @db.Date
-  teacher_id    Int      @default(autoincrement())
-  parent_id     Int      @default(autoincrement())
+  teacher_id    Int
+  parent_id     Int
   parents       parents  @relation(fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   teachers      teachers @relation(fields: [teacher_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
@@ -59,45 +49,39 @@ model parents {
 }
 
 model parents_students {
-  parent_id    Int                           @default(autoincrement())
-  student_id   Int                           @default(autoincrement())
+  parent_id    Int
+  student_id   Int
   relationship parent_student_relationships?
   parents      parents                       @relation(fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   students     students                      @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([parent_id, student_id])
-}
-
-model pricipals {
-  id             Int    @id @default(autoincrement())
-  nama           String
-  email          String
-  contact_number String
+  @@unique([parent_id, student_id], map: "parents_students_parent_id_student_id_idx")
 }
 
 model student_grades {
-  id         Int      @id @default(autoincrement())
-  student_id Int      @default(autoincrement())
-  subject_id Int      @default(autoincrement())
-  grade      Float
-  term       String
-  students   students @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  subjects   subjects @relation(fields: [subject_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                    Int                 @id @default(autoincrement())
+  student_id            Int
+  student_assignment_id Int
+  grade                 Decimal             @db.Decimal(5, 2)
+  term                  String
+  student_assignments   student_assignments @relation(fields: [student_assignment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  students              students            @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model students {
   id               Int                @id @default(autoincrement())
   nama             String
   jenis_kelamin    jenis_kelamin
-  NISN             String
-  attendance       attendance[]
+  NISN             String             @unique
+  attendance       attendances[]
   parents_students parents_students[]
   student_grades   student_grades[]
 }
 
 model subject_teachers {
-  subject_id Int      @default(autoincrement())
-  teacher_id Int      @default(autoincrement())
+  subject_id Int
+  teacher_id Int
   subjects   subjects @relation(fields: [subject_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   teachers   teachers @relation(fields: [teacher_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -105,21 +89,52 @@ model subject_teachers {
 }
 
 model subjects {
-  id               Int                @id @default(autoincrement())
-  subject_name     String
-  class_subjects   class_subjects[]
-  student_grades   student_grades[]
-  subject_teachers subject_teachers[]
+  id                  Int                   @id @default(autoincrement())
+  subject_name        String
+  class_subjects      class_subjects[]
+  student_assignments student_assignments[]
+  subject_teachers    subject_teachers[]
 }
 
 model teachers {
   id               Int                @id @default(autoincrement())
   nama             String
   jenis_kelamin    jenis_kelamin
-  NIP              String?
+  NIP              String             @unique
+  tanggal_lahir    DateTime?          @db.Date
+  NUPTK            String             @unique
   classes          classes[]
   feedbacks        feedbacks[]
   subject_teachers subject_teachers[]
+}
+
+model attendances {
+  id         Int                @id @default(autoincrement())
+  student_id Int
+  class_id   Int
+  date       DateTime?          @db.Date
+  status     attendance_status?
+  classes    classes            @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  students   students           @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([student_id, class_id, date], map: "attendance_student_id_class_id_date_idx")
+}
+
+model principals {
+  id             Int     @id @default(autoincrement())
+  nama     String
+  email          String
+  contact_number String
+}
+
+model student_assignments {
+  id             Int              @id @default(autoincrement())
+  subject_id     Int
+  date           DateTime         @db.Date
+  deadline_date  DateTime?        @db.Date
+  title          String
+  subjects       subjects         @relation(fields: [subject_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  student_grades student_grades[]
 }
 
 enum agama {
