@@ -1,5 +1,5 @@
-import { Hono } from "hono"
-import { prisma } from "../../prisma/db.js"
+import { Hono } from 'hono'
+import { prisma } from '../../prisma/db.js'
 // import { Student } from "../db/schemas/student-schema"
 
 const studentRouter = new Hono()
@@ -20,8 +20,14 @@ studentRouter
     const student = await prisma.students.findUnique({
       where: {
         id: Number.parseInt(id),
-      }
+      },
     })
+
+    if (!student) {
+      return c.json({
+        message: 'Student not found'
+      }, 400)
+    }
 
     return c.json({ student })
   })
@@ -32,19 +38,17 @@ studentRouter
       nama,
       NISN,
       jenis_kelamin,
-      attendance
     } = await c.req.json()
 
-    await prisma.students.create({
+    const student = await prisma.students.create({
       data: {
         nama,
         jenis_kelamin,
         NISN,
-        attendance,
-      }
+      },
     })
 
-    return c.text('Success', 200)
+    return c.json({ message: 'success', student })
   })
 
   // PUT /api/students/:id
@@ -54,10 +58,21 @@ studentRouter
       nama,
       NISN,
       jenis_kelamin,
-      attendance
     } = await c.req.json()
 
-    const student = await prisma.students.update({
+    const student = await prisma.students.findFirst({
+      where: {
+        id: Number.parseInt(id)
+      }
+    })
+
+    if (!student) {
+      return c.json({
+        message: "Student not found"
+      }, 400)
+    }
+    
+    await prisma.students.update({
       where: {
         id: Number.parseInt(id),
       },
@@ -65,27 +80,34 @@ studentRouter
         nama,
         NISN,
         jenis_kelamin,
-        attendance
-      }
+      },
     })
 
-    return c.json({ student })
+    return c.json({ message: 'success', student })
   })
 
   // DELETE /api/students/:id
   .delete('/:id', async (c) => {
     const id = c.req.param('id')
-    const student = await prisma.students.delete({
+    const student = await prisma.students.findFirst({
       where: {
-        id: Number.parseInt(id),
+        id: Number.parseInt(id)
       }
     })
 
-    return c.json({ student })
+    if(!student) {
+      return c.json({
+        message: "Student not found"
+      }, 400)
+    }
+    
+    await prisma.students.delete({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+
+    return c.json({ message: 'success', student })
   })
-
-  
-
-
 
 export default studentRouter
