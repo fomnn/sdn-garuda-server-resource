@@ -10,8 +10,8 @@ datasource db {
 model class_subjects {
   class_id   Int
   subject_id Int
-  classes    classes  @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  subjects   subjects @relation(fields: [subject_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  classes    classes  @relation(fields: [class_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  subjects   subjects @relation(fields: [subject_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([class_id, subject_id])
 }
@@ -22,7 +22,7 @@ model classes {
   teacher_id     Int?
   attendance     attendances[]
   class_subjects class_subjects[]
-  teachers       teachers?        @relation(fields: [teacher_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  teachers       teachers?        @relation(fields: [teacher_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 model feedbacks {
@@ -32,14 +32,15 @@ model feedbacks {
   date          DateTime @db.Date
   teacher_id    Int
   parent_id     Int
-  parents       parents  @relation(fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  teachers      teachers @relation(fields: [teacher_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parents       parents  @relation(fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  teachers      teachers @relation(fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model parents {
   id                 Int                @id @default(autoincrement())
   nama               String
   tahun_lahir        Int?
+  email              String             @unique
   jenjang_pendidikan String
   pekerjaan          String
   penghasilan        String
@@ -48,12 +49,32 @@ model parents {
   parents_students   parents_students[]
 }
 
+model accounts {
+  id       Int          @id @default(autoincrement())
+  email    String       @unique
+  password String
+  type     account_type
+  user_id  Int
+}
+
+model superadmin {
+  id       Int    @id @default(autoincrement())
+  username String
+  password String
+}
+
+enum account_type {
+  teacher
+  principal
+  parent
+}
+
 model parents_students {
   parent_id    Int
   student_id   Int
   relationship parent_student_relationships?
-  parents      parents                       @relation(fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  students     students                      @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parents      parents                       @relation(fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  students     students                      @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([parent_id, student_id])
   @@unique([parent_id, student_id], map: "parents_students_parent_id_student_id_idx")
@@ -83,7 +104,7 @@ model subject_teachers {
   subject_id Int
   teacher_id Int
   subjects   subjects @relation(fields: [subject_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  teachers   teachers @relation(fields: [teacher_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  teachers   teachers @relation(fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([subject_id, teacher_id])
 }
@@ -99,6 +120,7 @@ model subjects {
 model teachers {
   id               Int                @id @default(autoincrement())
   nama             String
+  email            String             @unique
   jenis_kelamin    jenis_kelamin
   NIP              String             @unique
   tanggal_lahir    DateTime?          @db.Date
@@ -114,16 +136,16 @@ model attendances {
   class_id   Int
   date       DateTime?          @db.Date
   status     attendance_status?
-  classes    classes            @relation(fields: [class_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  students   students           @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  classes    classes            @relation(fields: [class_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  students   students           @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([student_id, class_id, date], map: "attendance_student_id_class_id_date_idx")
 }
 
 model principals {
-  id             Int     @id @default(autoincrement())
-  nama     String
-  email          String
+  id             Int    @id @default(autoincrement())
+  nama           String
+  email          String @unique
   contact_number String
 }
 
@@ -133,8 +155,23 @@ model student_assignments {
   date           DateTime         @db.Date
   deadline_date  DateTime?        @db.Date
   title          String
-  subjects       subjects         @relation(fields: [subject_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subjects       subjects         @relation(fields: [subject_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   student_grades student_grades[]
+}
+
+model posts {
+  id         Int      @id @default(autoincrement())
+  title      String
+  image_path String?
+  created_at DateTime @default(now()) @db.Timestamptz()
+  updated_at DateTime @updatedAt @db.Timestamptz()
+}
+
+model posts_paragraphs {
+  id              Int    @id @default(autoincrement())
+  post_id         Int
+  content         String
+  paragraph_order Int
 }
 
 enum agama {
