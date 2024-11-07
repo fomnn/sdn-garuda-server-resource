@@ -10,7 +10,7 @@ async function startServer() {
 
   serve({
     fetch: app.fetch,
-    port
+    port,
   })
 }
 

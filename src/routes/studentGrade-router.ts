@@ -1,5 +1,5 @@
-import { Hono } from "hono";
-import { prisma } from "../../prisma/db.js";
+import { Hono } from 'hono'
+import { prisma } from '../../prisma/db.js'
 
 const studentGradeRouter = new Hono()
 
@@ -16,7 +16,7 @@ studentGradeRouter
     const studentGrade = await prisma.student_grades.findUnique({
       where: {
         id: Number.parseInt(id),
-      }
+      },
     })
 
     return c.json({ student_grade: studentGrade })
@@ -28,7 +28,7 @@ studentGradeRouter
       student_id,
       student_assignment_id,
       grade,
-      term
+      term,
     } = await c.req.json()
     const studentGrade = await prisma.student_grades.create({
       data: {
@@ -36,9 +36,9 @@ studentGradeRouter
         student_assignment_id,
         grade,
         term,
-      }
+      },
     })
-    return c.json({ student_grade: studentGrade })
+    return c.json({ message: 'success' })
   })
 
   // PUT /api/student_grades/:id
@@ -48,7 +48,7 @@ studentGradeRouter
       student_id,
       student_assignment_id,
       grade,
-      term
+      term,
     } = await c.req.json()
     const studentGrade = await prisma.student_grades.update({
       where: {
@@ -58,10 +58,10 @@ studentGradeRouter
         student_id,
         student_assignment_id,
         grade,
-        term
-      }
+        term,
+      },
     })
-    return c.json({ student_grade: studentGrade })
+    return c.json({ message: 'success' })
   })
 
   // DELETE /api/student_grades/:id
@@ -70,9 +70,9 @@ studentGradeRouter
     const studentGrade = await prisma.student_grades.delete({
       where: {
         id: Number.parseInt(id),
-      }
+      },
     })
-    return c.json({ student_grade: studentGrade })
+    return c.json({ message: 'success' })
   })
 
 export default studentGradeRouter

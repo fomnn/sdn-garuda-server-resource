@@ -1,5 +1,5 @@
-import { Hono } from "hono"
-import { prisma } from "../../prisma/db.js"
+import { Hono } from 'hono'
+import { prisma } from '../../prisma/db.js'
 // import { Class } from "../db/schemas/class-schema"
 
 const classRouter = new Hono()
@@ -10,7 +10,7 @@ classRouter
     const classes = await prisma.classes.findMany()
 
     return c.json({
-      classes
+      classes,
     })
   })
   // GET /api/classes/:id
@@ -19,11 +19,11 @@ classRouter
     const classData = await prisma.classes.findUnique({
       where: {
         id: Number.parseInt(id),
-      }
+      },
     })
 
     return c.json({
-      class: classData
+      class: classData,
     })
   })
   // POST /api/classes
@@ -36,10 +36,11 @@ classRouter
     await prisma.classes.create({
       data: {
         class_name,
-      }
+        ...(teacher_id && { teacher_id: Number.parseInt(teacher_id) }),
+      },
     })
 
-    return c.json({ message: "success" })
+    return c.json({ message: 'success' })
   })
 
   // DELETE /api/classes/:id
@@ -48,17 +49,18 @@ classRouter
     await prisma.classes.delete({
       where: {
         id: Number.parseInt(id),
-      }
+      },
     })
 
-    return c.json({ message: "success" })
+    return c.json({ message: 'success' })
   })
 
   // PUT /api/classes/:id
   .put('/:id', async (c) => {
     const id = c.req.param('id')
     const {
-      class_name
+      class_name,
+      teacher_id,
     } = await c.req.json()
 
     await prisma.classes.update({
@@ -66,11 +68,12 @@ classRouter
         id: Number.parseInt(id),
       },
       data: {
-        class_name
-      }
+        class_name,
+        teacher_id,
+      },
     })
 
-    return c.json({ message: "success" })
+    return c.json({ message: 'success' })
   })
 
 export default classRouter

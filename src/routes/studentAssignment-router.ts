@@ -1,5 +1,5 @@
-import { Hono } from "hono";
-import { prisma } from "../../prisma/db.js";
+import { Hono } from 'hono'
+import { prisma } from '../../prisma/db.js'
 
 const StudentAssignmentRouter = new Hono()
 
@@ -16,8 +16,8 @@ StudentAssignmentRouter
     const studentAssignment = await prisma.student_assignments.findUnique({
       where: {
         id: Number.parseInt(id),
-      }
-    })  
+      },
+    })
 
     return c.json({ student_assignment: studentAssignment })
   })
@@ -28,15 +28,15 @@ StudentAssignmentRouter
       title,
       date,
       deadline_date,
-      subject_id
+      subject_id,
     } = await c.req.json()
     const studentAssignment = await prisma.student_assignments.create({
       data: {
         title,
         date,
         deadline_date,
-        subject_id
-      }
+        subject_id,
+      },
     })
 
     return c.json({ student_assignment: studentAssignment })
@@ -49,7 +49,7 @@ StudentAssignmentRouter
       title,
       date,
       deadline_date,
-      subject_id
+      subject_id,
     } = await c.req.json()
     const studentAssignment = await prisma.student_assignments.update({
       where: {
@@ -59,8 +59,8 @@ StudentAssignmentRouter
         title,
         date,
         deadline_date,
-        subject_id
-      }
+        subject_id,
+      },
     })
 
     return c.json({ student_assignment: studentAssignment })
@@ -72,7 +72,7 @@ StudentAssignmentRouter
     const studentAssignment = await prisma.student_assignments.delete({
       where: {
         id: Number.parseInt(id),
-      }
+      },
     })
 
     return c.json({ student_assignment: studentAssignment })

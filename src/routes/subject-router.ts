@@ -1,5 +1,5 @@
-import { Hono } from "hono"
-import { prisma } from "../../prisma/db.js"
+import { Hono } from 'hono'
+import { prisma } from '../../prisma/db.js'
 // import { Subject } from "../db/schemas/subject-schema"
 
 const subjectRouter = new Hono()
@@ -18,11 +18,10 @@ subjectRouter
     const subject = await prisma.subjects.findUnique({
       where: {
         id: Number.parseInt(id),
-      }
-    }) 
+      },
+    })
 
     return c.json({ subject })
-
   })
 
   // POST /api/subjects
@@ -34,10 +33,10 @@ subjectRouter
     await prisma.subjects.create({
       data: {
         subject_name,
-      }
+      },
     })
 
-    return c.json({ success: true })
+    return c.json({ message: 'Created' })
   })
 
   // PUT /api/subjects/:id
@@ -53,10 +52,10 @@ subjectRouter
       },
       data: {
         subject_name,
-      }
+      },
     })
 
-    return c.json({ subject })
+    return c.json({ message: 'Updated' })
   })
 
   // DELETE /api/subjects/:id
@@ -65,10 +64,10 @@ subjectRouter
     const subject = await prisma.subjects.delete({
       where: {
         id: Number.parseInt(id),
-      }
+      },
     })
 
-    return c.json({ subject })
+    return c.json({ message: 'deleted', subject })
   })
 
 export default subjectRouter

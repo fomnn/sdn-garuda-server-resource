@@ -1,5 +1,5 @@
-import { Hono } from "hono";
-import { prisma } from "../../prisma/db.js";
+import { Hono } from 'hono'
+import { prisma } from '../../prisma/db.js'
 
 const attendanceRouter = new Hono()
 
@@ -7,7 +7,7 @@ attendanceRouter
   // GET /api/attendances
   .get('/', async (c) => {
     const attendances = await prisma.attendances.findMany()
-    
+
     return c.json({ attendances })
   })
 
@@ -17,7 +17,7 @@ attendanceRouter
     const attendance = await prisma.attendances.findUnique({
       where: {
         id: Number.parseInt(id),
-      }
+      },
     })
 
     return c.json({ attendance })
@@ -29,17 +29,17 @@ attendanceRouter
       student_id,
       class_id,
       date,
-      status
+      status,
     } = await c.req.json()
     const attendance = await prisma.attendances.create({
       data: {
         student_id,
         class_id,
-        date,
+        date: date,
         status,
-      }
+      },
     })
-    return c.json({ attendance })
+    return c.json({ message: 'success' })
   })
 
   // PUT /api/attendances/:id
@@ -49,7 +49,7 @@ attendanceRouter
       student_id,
       class_id,
       date,
-      status
+      status,
     } = await c.req.json()
     const attendance = await prisma.attendances.update({
       where: {
@@ -58,11 +58,11 @@ attendanceRouter
       data: {
         student_id,
         class_id,
-        date,
-        status
-      }
+        date: date,
+        status,
+      },
     })
-    return c.json({ attendance })
+    return c.json({ message: 'success' })
   })
 
   // DELETE /api/attendances/:id
@@ -71,9 +71,9 @@ attendanceRouter
     const attendance = await prisma.attendances.delete({
       where: {
         id: Number.parseInt(id),
-      }
+      },
     })
-    return c.json({ attendance })
+    return c.json({ message: 'success' })
   })
 
 export default attendanceRouter

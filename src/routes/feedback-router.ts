@@ -1,5 +1,5 @@
-import { Hono } from "hono";
-import { prisma } from "../../prisma/db.js";
+import { Hono } from 'hono'
+import { prisma } from '../../prisma/db.js'
 
 const feedbackRouter = new Hono()
 
@@ -7,6 +7,8 @@ feedbackRouter
   // GET /api/feedback
   .get('/', async (c) => {
     const feedback = await prisma.feedbacks.findMany()
+
+    console.log('bejir')
 
     return c.json({ feedback })
   })
@@ -17,7 +19,7 @@ feedbackRouter
     const feedback = await prisma.feedbacks.findUnique({
       where: {
         id: Number.parseInt(id),
-      }
+      },
     })
 
     return c.json({ feedback })
@@ -30,7 +32,7 @@ feedbackRouter
       rating,
       date,
       teacher_id,
-      parent_id
+      parent_id,
     } = await c.req.json()
 
     const feedback = await prisma.feedbacks.create({
@@ -40,9 +42,9 @@ feedbackRouter
         date,
         teacher_id,
         parent_id,
-      }
+      },
     })
-    return c.json({ feedback })
+    return c.json({ message: 'created' })
   })
 
   // PUT /api/feedback/:id
@@ -53,7 +55,7 @@ feedbackRouter
       rating,
       date,
       teacher_id,
-      parent_id
+      parent_id,
     } = await c.req.json()
 
     const feedback = await prisma.feedbacks.update({
@@ -65,11 +67,11 @@ feedbackRouter
         rating,
         date,
         teacher_id,
-        parent_id
-      }
+        parent_id,
+      },
     })
 
-    return c.json({ feedback })
+    return c.json({ message: 'updated' })
   })
 
   // DELETE /api/feedback/:id
@@ -78,10 +80,10 @@ feedbackRouter
     const feedback = await prisma.feedbacks.delete({
       where: {
         id: Number.parseInt(id),
-      }
+      },
     })
 
-    return c.json({ feedback })
+    return c.json({ message: 'deleted' })
   })
 
 export default feedbackRouter

@@ -1,5 +1,5 @@
-import { Hono } from "hono";
-import { prisma } from "../../prisma/db.js";
+import { Hono } from 'hono'
+import { prisma } from '../../prisma/db.js'
 
 const principalsRouter = new Hono()
 
@@ -16,7 +16,7 @@ principalsRouter
     const principal = await prisma.principals.findUnique({
       where: {
         id: Number.parseInt(id),
-      }
+      },
     })
     return c.json({ principal })
   })
@@ -26,15 +26,15 @@ principalsRouter
     const {
       nama,
       email,
-      contact_number
+      contact_number,
     } = await c.req.json()
 
     const principal = await prisma.principals.create({
       data: {
         nama,
         email,
-        contact_number
-      }
+        contact_number,
+      },
     })
 
     return c.json({ principal })
@@ -46,7 +46,7 @@ principalsRouter
     const {
       nama,
       email,
-      contact_number
+      contact_number,
     } = await c.req.json()
 
     const principal = await prisma.principals.update({
@@ -56,8 +56,8 @@ principalsRouter
       data: {
         nama,
         email,
-        contact_number
-      }
+        contact_number,
+      },
     })
 
     return c.json({ principal })
@@ -69,7 +69,7 @@ principalsRouter
     const principal = await prisma.principals.delete({
       where: {
         id: Number.parseInt(id),
-      }
+      },
     })
 
     return c.json({ principal })
