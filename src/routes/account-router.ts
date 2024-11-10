@@ -24,10 +24,45 @@ accountRouter
     if (!account) {
       return c.json({
         message: 'Account not found',
-      }, 400)
+      }, 404)
     }
 
     return c.json({ account })
+  })
+
+  .post('/', async (c) => {
+    const {
+      email,
+      password,
+      type,
+      user_id,
+    } = await c.req.json()
+
+    const accountConflicted = await prisma.accounts.findUnique({
+      where: {
+        email,
+      },
+    })
+
+    if (accountConflicted) {
+      return c.json({
+        message: 'Email already taken, use another email',
+      }, 409)
+    }
+
+    const account = await prisma.accounts.create({
+      data: {
+        email,
+        password,
+        type,
+        user_id,
+      },
+    })
+
+    return c.json({
+      message: 'Created',
+      account,
+    })
   })
 
   // PUT /api/accounts
@@ -39,7 +74,7 @@ accountRouter
       password,
     } = await c.req.json()
 
-    const account = await prisma.accounts.findFirst({
+    let account = await prisma.accounts.findFirst({
       where: {
         id: Number.parseInt(id),
       },
@@ -48,10 +83,10 @@ accountRouter
     if (!account) {
       return c.json({
         message: 'Account not found',
-      }, 400)
+      }, 404)
     }
 
-    await prisma.accounts.update({
+    account = await prisma.accounts.update({
       where: {
         id: Number.parseInt(id),
       },
@@ -61,7 +96,37 @@ accountRouter
       },
     })
 
-    return c.json({ message: 'updated', account })
+    return c.json({
+      message: 'Updated',
+      account,
+    })
+  })
+
+  .delete('/:id', async (c) => {
+    const id = c.req.param('id')
+
+    const account = await prisma.accounts.findFirst({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+
+    if (!account) {
+      return c.json({
+        message: 'Account not found',
+      }, 404)
+    }
+
+    await prisma.accounts.delete({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+
+    return c.json({
+      message: 'Deleted',
+      account,
+    })
   })
 
 export default accountRouter
