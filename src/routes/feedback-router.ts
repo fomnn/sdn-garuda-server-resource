@@ -6,11 +6,9 @@ const feedbackRouter = new Hono()
 feedbackRouter
   // GET /api/feedback
   .get('/', async (c) => {
-    const feedback = await prisma.feedbacks.findMany()
+    const feedbacks = await prisma.feedbacks.findMany()
 
-    console.log('bejir')
-
-    return c.json({ feedback })
+    return c.json({ feedbacks })
   })
 
   // GET /api/feedback/:id
@@ -21,6 +19,12 @@ feedbackRouter
         id: Number.parseInt(id),
       },
     })
+
+    if (!feedback) {
+      return c.json({
+        message: 'Feedback not found',
+      }, 404)
+    }
 
     return c.json({ feedback })
   })
@@ -44,7 +48,11 @@ feedbackRouter
         parent_id,
       },
     })
-    return c.json({ message: 'created' })
+
+    return c.json({
+      message: 'Created',
+      feedback,
+    })
   })
 
   // PUT /api/feedback/:id
@@ -58,7 +66,18 @@ feedbackRouter
       parent_id,
     } = await c.req.json()
 
-    const feedback = await prisma.feedbacks.update({
+    let feedback = await prisma.feedbacks.findFirst({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+
+    if (!feedback) {
+      return c.json({
+        message: 'Feedback not found',
+      }, 404)
+    }
+    feedback = await prisma.feedbacks.update({
       where: {
         id: Number.parseInt(id),
       },
@@ -71,19 +90,37 @@ feedbackRouter
       },
     })
 
-    return c.json({ message: 'updated' })
+    return c.json({
+      message: 'Updated',
+      feedback,
+    })
   })
 
   // DELETE /api/feedback/:id
   .delete('/:id', async (c) => {
     const id = c.req.param('id')
-    const feedback = await prisma.feedbacks.delete({
+    let feedback = await prisma.feedbacks.findFirst({
       where: {
         id: Number.parseInt(id),
       },
     })
 
-    return c.json({ message: 'deleted' })
+    if (!feedback) {
+      return c.json({
+        message: 'Feedback not found',
+      }, 404)
+    }
+
+    feedback = await prisma.feedbacks.delete({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+
+    return c.json({
+      message: 'Deleted',
+      feedback,
+    })
   })
 
 export default feedbackRouter
