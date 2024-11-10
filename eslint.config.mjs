@@ -1,12 +1,8 @@
-import baseConfig from '@hono/eslint-config'
-import stylistic from '@stylistic/eslint-plugin'
+import antfu from '@antfu/eslint-config'
 
-export default [
-  stylistic.configs['recommended-flat'],
-  ...baseConfig,
+export default antfu(
   {
-    rules: {
-      'no-console': ['warn'],
-    },
+    typescript: true,
+    test: true,
   },
-]
+)

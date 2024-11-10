@@ -20,6 +20,10 @@ parentRouter
       },
     })
 
+    if (!parent) {
+      return c.json({ message: 'Parent not found' }, 400)
+    }
+
     const students = await prisma.students.findMany({
       where: {
         parents_students: {
@@ -29,10 +33,6 @@ parentRouter
         },
       },
     })
-
-    if (!parent) {
-      return c.json({ message: 'Parent not found' }, 400)
-    }
 
     return c.json({ parent, students })
   })
@@ -46,8 +46,20 @@ parentRouter
       pekerjaan,
       tahun_lahir,
       penghasilan,
-      email
+      email,
     } = await c.req.json()
+
+    const emailConflicted = await prisma.parents.findUnique({
+      where: {
+        email,
+      },
+    })
+
+    if (emailConflicted) {
+      return c.json({
+        message: 'Email already taken, use another email',
+      }, 409)
+    }
 
     const parent = await prisma.parents.create({
       data: {
@@ -61,7 +73,7 @@ parentRouter
       },
     })
 
-    return c.json({ message: 'success', parent })
+    return c.json({ message: 'Created', parent })
   })
 
   // DELETE /api/parents/:id
@@ -84,7 +96,7 @@ parentRouter
       },
     })
 
-    return c.json({ message: 'success', parent })
+    return c.json({ message: 'Deleted', parent })
   })
 
   // PUT /api/parents/:id
@@ -97,10 +109,10 @@ parentRouter
       pekerjaan,
       tahun_lahir,
       penghasilan,
-      email
+      email,
     } = await c.req.json()
 
-    const parent = await prisma.parents.findFirst({
+    let parent = await prisma.parents.findFirst({
       where: {
         id: Number.parseInt(id),
       },
@@ -112,7 +124,22 @@ parentRouter
       }, 400)
     }
 
-    await prisma.parents.update({
+    const emailConflicted = await prisma.parents.findUnique({
+      where: {
+        email,
+        NOT: {
+          id: Number.parseInt(id),
+        },
+      },
+    })
+
+    if (emailConflicted) {
+      return c.json({
+        message: 'Email already taken, use another email',
+      }, 409)
+    }
+
+    parent = await prisma.parents.update({
       where: {
         id: Number.parseInt(id),
       },
@@ -127,7 +154,7 @@ parentRouter
       },
     })
 
-    return c.json({ message: 'success', parent })
+    return c.json({ message: 'Updated', parent })
   })
 
 export default parentRouter

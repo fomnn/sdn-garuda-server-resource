@@ -31,38 +31,38 @@ postRouter
   .post('/', async (c) => {
     const {
       title,
-      image_path
+      image_path,
     } = await c.req.json()
 
     await prisma.posts.create({
       data: {
         title,
-        image_path
-      }
+        image_path,
+      },
     })
 
     return c.json({
-      message: "Created"
+      message: 'Created',
     })
   })
-  
+
   .put('/:id', async (c) => {
     const id = c.req.param('id')
 
     const {
       title,
-      image_path
+      image_path,
     } = await c.req.json()
 
     const post = await prisma.posts.findFirst({
       where: {
-        id: Number.parseInt(id)
-      }
+        id: Number.parseInt(id),
+      },
     })
 
     if (!post) {
       return c.json({
-        message: "Post not found"
+        message: 'Post not found',
       }, 400)
     }
 
@@ -72,12 +72,12 @@ postRouter
         image_path,
       },
       where: {
-        id: Number.parseInt(id)
-      }
+        id: Number.parseInt(id),
+      },
     })
 
     return c.json({
-      message: "Updated"
+      message: 'Updated',
     })
   })
 
@@ -86,23 +86,23 @@ postRouter
 
     const post = await prisma.posts.findFirst({
       where: {
-        id: Number.parseInt(id)
-      }
+        id: Number.parseInt(id),
+      },
     })
 
     if (!post) {
       return c.json({
-        message: 'Post not found'
+        message: 'Post not found',
       }, 400)
     }
 
     await prisma.posts.delete({
       where: {
-        id: Number.parseInt(id)
-      }
+        id: Number.parseInt(id),
+      },
     })
 
     return c.json({
-      message: 'Deleted'
+      message: 'Deleted',
     })
   })

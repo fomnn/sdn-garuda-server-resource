@@ -3,12 +3,12 @@
     "target": "ESNext",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "strict": true,
-    "skipLibCheck": true,
     "types": [
       "node"
     ],
+    "strict": true,
     "outDir": "./dist",
+    "skipLibCheck": true
     // "paths": {
     //   "@/*": ["./src/*"]
     // }

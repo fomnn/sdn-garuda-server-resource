@@ -23,6 +23,12 @@ teacherRouter
       },
     })
 
+    if (!teacher) {
+      return c.json({
+        message: 'Teacher not found',
+      }, 400)
+    }
+
     return c.json({ teacher })
   })
 
@@ -34,19 +40,37 @@ teacherRouter
       NIP,
       NUPTK,
       tanggal_lahir,
+      email,
     } = await c.req.json()
 
-    await prisma.teachers.create({
+    let teacher = await prisma.teachers.findFirst({
+      where: {
+        OR: [
+          { email },
+          { NIP },
+          { NUPTK },
+        ],
+      },
+    })
+
+    if (teacher) {
+      return c.json({
+        message: 'email, NIP, or NUPTK is conflicted',
+      }, 409)
+    }
+
+    teacher = await prisma.teachers.create({
       data: {
         nama,
         jenis_kelamin,
         NIP,
         tanggal_lahir,
         NUPTK,
+        email,
       },
     })
 
-    return c.json({ message: 'success' })
+    return c.json({ message: 'Created', teacher })
   })
 
   // PUT /api/teachers/:id
@@ -58,9 +82,47 @@ teacherRouter
       NIP,
       NUPTK,
       tanggal_lahir,
+      email,
     } = await c.req.json()
 
-    const teacher = await prisma.teachers.update({
+    let teacher = await prisma.teachers.findFirst({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+
+    if (!teacher) {
+      return c.json({
+        message: 'Teacher not found',
+      }, 400)
+    }
+
+    teacher = await prisma.teachers.findFirst({
+      where: {
+        AND: [
+          {
+            OR: [
+              { email },
+              { NIP },
+              { NUPTK },
+            ],
+          },
+          {
+            NOT: {
+              id: Number.parseInt(id),
+            },
+          },
+        ],
+      },
+    })
+
+    if (teacher) {
+      return c.json({
+        message: 'email, NIP, or NUPTK is conflicted',
+      }, 409)
+    }
+
+    teacher = await prisma.teachers.update({
       where: {
         id: Number.parseInt(id),
       },
@@ -69,23 +131,37 @@ teacherRouter
         jenis_kelamin,
         NIP,
         NUPTK,
+        email,
         tanggal_lahir: new Date(tanggal_lahir),
       },
     })
 
-    return c.json({ message: 'success' })
+    return c.json({ message: 'Updated', teacher })
   })
 
   // DELETE /api/teachers/:id
   .delete('/:id', async (c) => {
     const id = c.req.param('id')
-    const teacher = await prisma.teachers.delete({
+
+    const teacher = await prisma.teachers.findFirst({
       where: {
         id: Number.parseInt(id),
       },
     })
 
-    return c.json({ message: 'success' })
+    if (!teacher) {
+      return c.json({
+        message: 'Teacher not found',
+      }, 400)
+    }
+
+    await prisma.teachers.delete({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+
+    return c.json({ message: 'Deleted', teacher })
   })
 
 export default teacherRouter

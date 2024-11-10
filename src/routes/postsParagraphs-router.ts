@@ -49,7 +49,7 @@ postsParagraphsRouter
 
     return c.json({
       message: 'Created',
-      postParagraph
+      postParagraph,
     })
   })
 
@@ -85,7 +85,7 @@ postsParagraphsRouter
 
     return c.json({
       message: 'Updated',
-      postParagraph
+      postParagraph,
     })
   })
 
@@ -112,6 +112,6 @@ postsParagraphsRouter
 
     return c.json({
       message: 'Deleted',
-      postParagraph
+      postParagraph,
     })
   })

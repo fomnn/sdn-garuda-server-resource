@@ -25,7 +25,7 @@ studentRouter
 
     if (!student) {
       return c.json({
-        message: 'Student not found'
+        message: 'Student not found',
       }, 400)
     }
 
@@ -40,7 +40,19 @@ studentRouter
       jenis_kelamin,
     } = await c.req.json()
 
-    const student = await prisma.students.create({
+    let student = await prisma.students.findUnique({
+      where: {
+        NISN,
+      },
+    })
+
+    if (student) {
+      return c.json({
+        message: 'NISN already used',
+      }, 409)
+    }
+
+    student = await prisma.students.create({
       data: {
         nama,
         jenis_kelamin,
@@ -60,19 +72,34 @@ studentRouter
       jenis_kelamin,
     } = await c.req.json()
 
-    const student = await prisma.students.findFirst({
+    let student = await prisma.students.findUnique({
       where: {
-        id: Number.parseInt(id)
-      }
+        NISN,
+        NOT: {
+          id: Number.parseInt(id),
+        },
+      },
+    })
+
+    if (student) {
+      return c.json({
+        message: 'NISN already used',
+      }, 409)
+    }
+
+    student = await prisma.students.findFirst({
+      where: {
+        id: Number.parseInt(id),
+      },
     })
 
     if (!student) {
       return c.json({
-        message: "Student not found"
+        message: 'Student not found',
       }, 400)
     }
-    
-    await prisma.students.update({
+
+    student = await prisma.students.update({
       where: {
         id: Number.parseInt(id),
       },
@@ -91,16 +118,16 @@ studentRouter
     const id = c.req.param('id')
     const student = await prisma.students.findFirst({
       where: {
-        id: Number.parseInt(id)
-      }
+        id: Number.parseInt(id),
+      },
     })
 
-    if(!student) {
+    if (!student) {
       return c.json({
-        message: "Student not found"
+        message: 'Student not found',
       }, 400)
     }
-    
+
     await prisma.students.delete({
       where: {
         id: Number.parseInt(id),

@@ -35,7 +35,7 @@ attendanceRouter
       data: {
         student_id,
         class_id,
-        date: date,
+        date,
         status,
       },
     })
@@ -58,7 +58,7 @@ attendanceRouter
       data: {
         student_id,
         class_id,
-        date: date,
+        date,
         status,
       },
     })

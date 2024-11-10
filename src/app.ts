@@ -1,6 +1,5 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
-import xlsx from 'node-xlsx'
 import accountRouter from './routes/account-router.js'
 import attendanceRouter from './routes/attendance-router.js'
 import authenticationRouter from './routes/authentication-router.js'
@@ -12,7 +11,6 @@ import StudentAssignmentRouter from './routes/studentAssignment-router.js'
 import studentGradeRouter from './routes/studentGrade-router.js'
 import subjectRouter from './routes/subject-router.js'
 import teacherRouter from './routes/teacher-router.js'
-import { ParentInterface } from './types/Parent.js'
 
 const app = new Hono().basePath('/api')
 

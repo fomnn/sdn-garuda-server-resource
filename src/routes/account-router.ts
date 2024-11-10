@@ -36,13 +36,13 @@ accountRouter
 
     const {
       email,
-      password
+      password,
     } = await c.req.json()
 
     const account = await prisma.accounts.findFirst({
       where: {
-        id: Number.parseInt(id)
-      }
+        id: Number.parseInt(id),
+      },
     })
 
     if (!account) {
@@ -53,15 +53,15 @@ accountRouter
 
     await prisma.accounts.update({
       where: {
-        id: Number.parseInt(id)
+        id: Number.parseInt(id),
       },
       data: {
         email,
         password,
-      }
+      },
     })
 
-    return c.json({ message: "updated", account })
+    return c.json({ message: 'updated', account })
   })
 
 export default accountRouter

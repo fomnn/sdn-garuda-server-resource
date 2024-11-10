@@ -1,5 +1,5 @@
-import { Hono } from 'hono'
 import type { JwtVariables } from 'hono/jwt'
+import { Hono } from 'hono'
 import { jwt, sign } from 'hono/jwt'
 import { prisma } from '../../prisma/db.js'
 

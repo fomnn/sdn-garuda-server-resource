@@ -9,7 +9,7 @@ async function main() {
       { username: 'admin3', password: 'password3' },
       { username: 'admin4', password: 'password4' },
       { username: 'admin5', password: 'password5' },
-    ]
+    ],
   })
 
   // Seeding data for `account`
@@ -20,7 +20,7 @@ async function main() {
       { email: 'principal1@example.com', password: 'password', type: 'principal', user_id: 3 },
       { email: 'parent2@example.com', password: 'password', type: 'parent', user_id: 4 },
       { email: 'teacher2@example.com', password: 'password', type: 'teacher', user_id: 5 },
-    ]
+    ],
   })
 
   // Seeding data for `teachers`
@@ -31,7 +31,7 @@ async function main() {
       { nama: 'Teacher Three', email: 'teacher3@example.com', jenis_kelamin: 'male', NIP: '34567', NUPTK: '76543' },
       { nama: 'Teacher Four', email: 'teacher4@example.com', jenis_kelamin: 'female', NIP: '45678', NUPTK: '87654' },
       { nama: 'Teacher Five', email: 'teacher5@example.com', jenis_kelamin: 'male', NIP: '56789', NUPTK: '98765' },
-    ]
+    ],
   })
 
   // Seeding data for `classes`
@@ -42,7 +42,7 @@ async function main() {
       { class_name: 'Class 3', teacher_id: 3 },
       { class_name: 'Class 4', teacher_id: 4 },
       { class_name: 'Class 5', teacher_id: 5 },
-    ]
+    ],
   })
 
   // Seeding data for `parents`
@@ -53,7 +53,7 @@ async function main() {
       { nama: 'Parent Three', email: 'parent_three@example.com', tahun_lahir: 1980, jenjang_pendidikan: 'Master', pekerjaan: 'Doctor', penghasilan: '6000000', NIK: '123459876' },
       { nama: 'Parent Four', email: 'parent_four@example.com', tahun_lahir: 1985, jenjang_pendidikan: 'Diploma', pekerjaan: 'Lawyer', penghasilan: '7000000', NIK: '987651234' },
       { nama: 'Parent Five', email: 'parent_five@example.com', tahun_lahir: 1990, jenjang_pendidikan: 'PhD', pekerjaan: 'Scientist', penghasilan: '8000000', NIK: '1122334455' },
-    ]
+    ],
   })
 
   // Seeding data for `feedbacks`
@@ -64,7 +64,7 @@ async function main() {
       { feedback_text: 'Average teacher', rating: 3, date: new Date(), teacher_id: 3, parent_id: 3 },
       { feedback_text: 'Not satisfied', rating: 2, date: new Date(), teacher_id: 4, parent_id: 4 },
       { feedback_text: 'Excellent', rating: 5, date: new Date(), teacher_id: 5, parent_id: 5 },
-    ]
+    ],
   })
 
   // Seeding data for `students`
@@ -75,7 +75,7 @@ async function main() {
       { nama: 'Student Three', jenis_kelamin: 'male', NISN: 'S345678' },
       { nama: 'Student Four', jenis_kelamin: 'female', NISN: 'S456789' },
       { nama: 'Student Five', jenis_kelamin: 'male', NISN: 'S567890' },
-    ]
+    ],
   })
 
   // Seeding data for `subjects`
@@ -86,7 +86,7 @@ async function main() {
       { subject_name: 'History' },
       { subject_name: 'Geography' },
       { subject_name: 'English' },
-    ]
+    ],
   })
 
   // Seeding data for `class_subjects`
@@ -97,7 +97,7 @@ async function main() {
       { class_id: 3, subject_id: 3 },
       { class_id: 4, subject_id: 4 },
       { class_id: 5, subject_id: 5 },
-    ]
+    ],
   })
 
   // Seeding data for `parents_students`
@@ -108,7 +108,7 @@ async function main() {
       { parent_id: 3, student_id: 3, relationship: 'guardian' },
       { parent_id: 4, student_id: 4, relationship: 'father' },
       { parent_id: 5, student_id: 5, relationship: 'mother' },
-    ]
+    ],
   })
 
   // Seeding data for `attendances`
@@ -119,7 +119,7 @@ async function main() {
       { student_id: 3, class_id: 3, date: new Date(), status: 'excused' },
       { student_id: 4, class_id: 4, date: new Date(), status: 'present' },
       { student_id: 5, class_id: 5, date: new Date(), status: 'present' },
-    ]
+    ],
   })
 }
 
