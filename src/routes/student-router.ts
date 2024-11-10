@@ -60,7 +60,10 @@ studentRouter
       },
     })
 
-    return c.json({ message: 'success', student })
+    return c.json({
+      message: 'Created',
+      student,
+    })
   })
 
   // PUT /api/students/:id
@@ -72,7 +75,19 @@ studentRouter
       jenis_kelamin,
     } = await c.req.json()
 
-    let student = await prisma.students.findUnique({
+    let student = await prisma.students.findFirst({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+
+    if (!student) {
+      return c.json({
+        message: 'Student not found',
+      }, 404)
+    }
+
+    student = await prisma.students.findUnique({
       where: {
         NISN,
         NOT: {
@@ -87,18 +102,6 @@ studentRouter
       }, 409)
     }
 
-    student = await prisma.students.findFirst({
-      where: {
-        id: Number.parseInt(id),
-      },
-    })
-
-    if (!student) {
-      return c.json({
-        message: 'Student not found',
-      }, 404)
-    }
-
     student = await prisma.students.update({
       where: {
         id: Number.parseInt(id),
@@ -110,7 +113,10 @@ studentRouter
       },
     })
 
-    return c.json({ message: 'success', student })
+    return c.json({
+      message: 'Updated',
+      student,
+    })
   })
 
   // DELETE /api/students/:id
@@ -134,7 +140,10 @@ studentRouter
       },
     })
 
-    return c.json({ message: 'success', student })
+    return c.json({
+      message: 'Deleted',
+      student,
+    })
   })
 
 export default studentRouter

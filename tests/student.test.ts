@@ -5,7 +5,7 @@ import app from '../src/app.js'
 
 let createdStudentId: number
 
-describe('student API Tests', () => {
+describe('student API tests', () => {
   const newStudent = {
     nama: faker.person.fullName(),
     NISN: faker.string.numeric(8),
@@ -55,7 +55,7 @@ describe('student API Tests', () => {
 
       expect(res.status).toBe(200)
       const body = await res.json()
-      expect(body).toHaveProperty('message', 'success')
+      expect(body).toHaveProperty('message', 'Created')
 
       // Mengambil ID student yang dibuat
       const studentsRes = await app.request('/api/students')
@@ -86,7 +86,8 @@ describe('student API Tests', () => {
       expect(res.status).toBe(200)
 
       const body = await res.json()
-      expect(body).toHaveProperty('message', 'success')
+      expect(body).toHaveProperty('message', 'Updated')
+      expect(body.student).toMatchObject(updatedStudent)
     })
 
     it('should throw an error 409 if NISN conflicted', async () => {
@@ -102,12 +103,6 @@ describe('student API Tests', () => {
     })
 
     it('should throw an error 404 if student not found', async () => {
-      const updatedStudent = {
-        nama: faker.person.fullName(),
-        NISN: faker.string.numeric(8),
-        jenis_kelamin: 'male',
-      }
-
       const res = await app.request('/api/students/9999', {
         method: 'PUT',
         body: JSON.stringify(updatedStudent),
@@ -125,7 +120,8 @@ describe('student API Tests', () => {
       })
       expect(res.status).toBe(200)
       const body = await res.json()
-      expect(body).toHaveProperty('message', 'success')
+      expect(body).toHaveProperty('message', 'Deleted')
+      expect(body.student).toMatchObject(updatedStudent)
     })
 
     it('should throw an error 404 if student not found', async () => {
