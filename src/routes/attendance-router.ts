@@ -20,6 +20,12 @@ attendanceRouter
       },
     })
 
+    if (!attendance) {
+      return c.json({
+        message: 'Attendance not found',
+      }, 400)
+    }
+
     return c.json({ attendance })
   })
 
@@ -39,7 +45,11 @@ attendanceRouter
         status,
       },
     })
-    return c.json({ message: 'success' })
+
+    return c.json({
+      message: 'Created',
+      attendance,
+    })
   })
 
   // PUT /api/attendances/:id
@@ -51,7 +61,18 @@ attendanceRouter
       date,
       status,
     } = await c.req.json()
-    const attendance = await prisma.attendances.update({
+    let attendance = await prisma.attendances.findFirst({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+
+    if (!attendance) {
+      return c.json({
+        message: 'Attendance not found',
+      }, 400)
+    }
+    attendance = await prisma.attendances.update({
       where: {
         id: Number.parseInt(id),
       },
@@ -62,18 +83,36 @@ attendanceRouter
         status,
       },
     })
-    return c.json({ message: 'success' })
+    return c.json({
+      message: 'Updated',
+      attendance,
+    })
   })
 
   // DELETE /api/attendances/:id
   .delete('/:id', async (c) => {
     const id = c.req.param('id')
-    const attendance = await prisma.attendances.delete({
+
+    let attendance = await prisma.attendances.findFirst({
       where: {
         id: Number.parseInt(id),
       },
     })
-    return c.json({ message: 'success' })
+
+    if (!attendance) {
+      return c.json({
+        message: 'Attendance not found',
+      }, 400)
+    }
+    attendance = await prisma.attendances.delete({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+    return c.json({
+      message: 'Deleted',
+      attendance,
+    })
   })
 
 export default attendanceRouter

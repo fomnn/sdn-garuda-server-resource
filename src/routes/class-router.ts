@@ -22,6 +22,12 @@ classRouter
       },
     })
 
+    if (!classData) {
+      return c.json({
+        message: 'Class not found',
+      }, 400)
+    }
+
     return c.json({
       class: classData,
     })
@@ -33,26 +39,43 @@ classRouter
       teacher_id,
     } = await c.req.json()
 
-    await prisma.classes.create({
+    const classData = await prisma.classes.create({
       data: {
         class_name,
         ...(teacher_id && { teacher_id: Number.parseInt(teacher_id) }),
       },
     })
 
-    return c.json({ message: 'success' })
+    return c.json({
+      message: 'Created',
+      class: classData,
+    })
   })
 
   // DELETE /api/classes/:id
   .delete('/:id', async (c) => {
     const id = c.req.param('id')
-    await prisma.classes.delete({
+    let classData = await prisma.classes.findFirst({
+      where: {
+        id: Number.parseInt(id)
+      }
+    })
+
+    if (!classData) {
+      return c.json({
+        message: "Class not found"
+      }, 400)
+    }
+    classData = await prisma.classes.delete({
       where: {
         id: Number.parseInt(id),
       },
     })
 
-    return c.json({ message: 'success' })
+    return c.json({ 
+      message: 'Deleted',
+      class: classData
+    })
   })
 
   // PUT /api/classes/:id
@@ -63,7 +86,19 @@ classRouter
       teacher_id,
     } = await c.req.json()
 
-    await prisma.classes.update({
+    let classData = await prisma.classes.findFirst({
+      where: {
+        id: Number.parseInt(id)
+      }
+    })
+
+    if (!classData) {
+      return c.json({
+        message: 'Class not found'
+      }, 400)
+    }
+
+    classData = await prisma.classes.update({
       where: {
         id: Number.parseInt(id),
       },
@@ -73,7 +108,10 @@ classRouter
       },
     })
 
-    return c.json({ message: 'success' })
+    return c.json({ 
+      message: 'Updated',
+      class: classData
+    })
   })
 
 export default classRouter
