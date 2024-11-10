@@ -1,21 +1,51 @@
 import type { parents } from '@prisma/client'
-import { expect, describe, test } from 'vitest'
+import { faker } from '@faker-js/faker'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 import app from '../src/app.js'
 
 let createdParentId: number
 
-describe('Parent API Tests', () => {
-  describe('GET /api/parents', () => {
-    test('Should get all parents', async () => {
+describe('parent API Tests', () => {
+  const newParent: Omit<parents, 'id'> = {
+    nama: faker.person.fullName(),
+    jenjang_pendidikan: 'sma',
+    NIK: faker.string.numeric(16),
+    pekerjaan: 'Ibu Rumah Tangga',
+    tahun_lahir: 2000,
+    penghasilan: '0',
+    email: faker.internet.email(),
+  }
+  const updatedParent: Omit<parents, 'id'> = {
+    nama: faker.person.fullName(),
+    jenjang_pendidikan: 'sma',
+    NIK: faker.string.numeric(16),
+    pekerjaan: 'Ibu Rumah Tangga',
+    tahun_lahir: 2000,
+    penghasilan: '0',
+    email: faker.internet.email(),
+  }
+  const parentWithConflictedData: Omit<parents, 'id'> = {
+    nama: faker.person.fullName(),
+    jenjang_pendidikan: 'sma',
+    NIK: faker.string.numeric(16),
+    pekerjaan: 'Ibu Rumah Tangga',
+    tahun_lahir: 2000,
+    penghasilan: '0',
+    email: 'parent_one@example.com',
+  }
+
+  describe('get /api/parents', () => {
+    it('should get all parents', async () => {
       const res = await app.request('/api/parents')
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body).toHaveProperty('parents')
+      expectTypeOf(body.parents)
     })
   })
 
-  describe('GET /api/parents/:id', () => {
-    test('Should get parent and their children', async () => {
+  describe('get /api/parents/:id', () => {
+    it('should get parent and their children', async () => {
       const res = await app.request('/api/parents/1')
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -23,24 +53,17 @@ describe('Parent API Tests', () => {
       expect(body).toHaveProperty('students')
     })
 
-    test('Should return 400 if parent not found', async () => {
+    it('should throw an error 400 if parent not found', async () => {
       const res2 = await app.request('/api/parents/500')
       expect(res2.status).toBe(400)
+
+      const body = await res2.json()
+      expect(body.message).toBe('Parent not found')
     })
   })
 
-  describe('POST /api/parents', () => {
-    test('Should create a new parent', async () => {
-      const newParent: Omit<parents, 'id'> = {
-        nama: 'fasdf',
-        jenjang_pendidikan: 'sma',
-        NIK: '123124124',
-        pekerjaan: 'Ibu Rumah Tangga',
-        tahun_lahir: 2000,
-        penghasilan: '0',
-        email: 'fsdkjf@fsd.fds'
-      }
-
+  describe('post /api/parents', () => {
+    it('should create a new parent', async () => {
       const res = await app.request('/api/parents', {
         method: 'POST',
         body: JSON.stringify(newParent),
@@ -48,23 +71,27 @@ describe('Parent API Tests', () => {
       })
 
       expect(res.status).toBe(200)
-      const parent = (await res.json()).parent
-      createdParentId = parent.id
+      const body = await res.json()
+      expect(body).toHaveProperty('message', 'Created')
+      expect(body.parent).toMatchObject<Omit<parents, 'id'>>(newParent)
+      createdParentId = body.parent.id
+    })
+
+    it('should throw an error 409 if email conflicted', async () => {
+      const res = await app.request('/api/parents', {
+        method: 'POST',
+        body: JSON.stringify(parentWithConflictedData),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+      })
+
+      expect(res.status).toBe(409)
+      const body = await res.json()
+      expect(body).toHaveProperty('message', 'Email already taken, use another email')
     })
   })
 
-  describe('PUT /api/parents/:id', () => {
-    test('Should update a parent', async () => {
-      const updatedParent: Omit<parents, 'id'> = {
-        nama: 'updated',
-        jenjang_pendidikan: 's1',
-        NIK: '123124124',
-        pekerjaan: 'Ibu Rumah Tangga',
-        tahun_lahir: 2000,
-        penghasilan: '0',
-        email: 'tesupdate@gsdlf.sdf'
-      }
-
+  describe('put /api/parents/:id', () => {
+    it('should update a parent', async () => {
       const res = await app.request(`/api/parents/${createdParentId}`, {
         method: 'PUT',
         body: JSON.stringify(updatedParent),
@@ -72,17 +99,30 @@ describe('Parent API Tests', () => {
       })
 
       expect(res.status).toBe(200)
+
+      const body = await res.json()
+      expect(body).toHaveProperty('message', 'Updated')
+      expect(body.parent).toMatchObject<Omit<parents, 'id'>>(updatedParent)
     })
 
-    test('Should return 400 if parent not found', async () => {
+    it('should throw an error 409 if any data conflicted', async () => {
+      const res = await app.request(`/api/parents/${createdParentId}`, {
+        method: 'PUT',
+        body: JSON.stringify(parentWithConflictedData),
+      })
+
+      expect(res.status).toBe(409)
+    })
+
+    it('should throw an error 400 if parent not found', async () => {
       const updatedParent: Omit<parents, 'id'> = {
-        nama: 'updated',
-        jenjang_pendidikan: 's1',
-        NIK: '123124124',
+        nama: faker.person.fullName(),
+        jenjang_pendidikan: 'sma',
+        NIK: faker.string.numeric(16),
         pekerjaan: 'Ibu Rumah Tangga',
         tahun_lahir: 2000,
         penghasilan: '0',
-        email: 'tesupdate@gsdlf.sdf'
+        email: faker.internet.email(),
       }
 
       const res2 = await app.request('/api/parents/500', {
@@ -95,15 +135,19 @@ describe('Parent API Tests', () => {
     })
   })
 
-  describe('DELETE /api/parents/:id', () => {
-    test('Should delete a parent', async () => {
+  describe('delete /api/parents/:id', () => {
+    it('should delete a parent', async () => {
       const res = await app.request(`/api/parents/${createdParentId}`, {
         method: 'DELETE',
       })
       expect(res.status).toBe(200)
+
+      const body = await res.json()
+      expect(body).toHaveProperty('message', 'Deleted')
+      expect(body.parent).toMatchObject<Omit<parents, 'id'>>(updatedParent)
     })
 
-    test('Should return 400 if parent not found', async () => {
+    it('should throw an error 400 if parent not found', async () => {
       const res2 = await app.request('/api/parents/5', {
         method: 'DELETE',
       })

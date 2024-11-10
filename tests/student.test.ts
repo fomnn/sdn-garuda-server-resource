@@ -1,12 +1,29 @@
 import type { students } from '@prisma/client'
-import { expect, describe, test } from 'vitest'
-import app from '../src/app.js' // Asumsi 'app' menggunakan studentRouter
+import { faker } from '@faker-js/faker'
+import { describe, expect, it } from 'vitest'
+import app from '../src/app.js'
 
 let createdStudentId: number
 
-describe('Student API Tests', () => {
-  describe('GET /api/students', () => {
-    test('Should get all students', async () => {
+describe('student API Tests', () => {
+  const newStudent = {
+    nama: faker.person.fullName(),
+    NISN: faker.string.numeric(8),
+    jenis_kelamin: 'male',
+  }
+  const updatedStudent = {
+    nama: faker.person.fullName(),
+    NISN: faker.string.numeric(8),
+    jenis_kelamin: 'male',
+  }
+  const studentWithConflictedNISN = {
+    nama: faker.person.fullName(),
+    NISN: 'S123456',
+    jenis_kelamin: 'male',
+  }
+
+  describe('get /api/students', () => {
+    it('should get all students', async () => {
       const res = await app.request('/api/students')
       expect(res.status).toBe(200)
       const body = await res.json()
@@ -14,28 +31,22 @@ describe('Student API Tests', () => {
     })
   })
 
-  describe('GET /api/students/:id', () => {
-    test('Should get a student', async () => {
+  describe('get /api/students/:id', () => {
+    it('should get a student', async () => {
       const res = await app.request('/api/students/1') // Gunakan ID yang ada
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body).toHaveProperty('student')
     })
 
-    test('Should return 400 if student not found', async () => {
+    it('should throw an error 400 if student not found', async () => {
       const res = await app.request('/api/students/500') // ID yang tidak ada
       expect(res.status).toBe(400)
     })
   })
 
-  describe('POST /api/students', () => {
-    test('Should create a new student', async () => {
-      const newStudent = {
-        nama: 'Test Student',
-        NISN: '123456789',
-        jenis_kelamin: 'male',
-      }
-
+  describe('post /api/students', () => {
+    it('should create a new student', async () => {
       const res = await app.request('/api/students', {
         method: 'POST',
         body: JSON.stringify(newStudent),
@@ -51,32 +62,50 @@ describe('Student API Tests', () => {
       const studentsBody = await studentsRes.json()
       createdStudentId = studentsBody.students.find((s: students) => s.NISN === newStudent.NISN).id
     })
+
+    it('should throw an error 409 if NISN conflicted', async () => {
+      const res = await app.request('/api/students', {
+        method: 'POST',
+        body: JSON.stringify(studentWithConflictedNISN),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+      })
+      expect(res.status).toBe(409)
+
+      const body = await res.json()
+      expect(body).toHaveProperty('message', 'NISN already used')
+    })
   })
 
-  describe('PUT /api/students/:id', () => {
-    test('Should update a student', async () => {
-      const updatedStudent = {
-        nama: 'Updated Student',
-        NISN: '123456789',
-        jenis_kelamin: 'female',
-      }
-
+  describe('put /api/students/:id', () => {
+    it('should update a student', async () => {
       const res = await app.request(`/api/students/${createdStudentId}`, {
         method: 'PUT',
         body: JSON.stringify(updatedStudent),
         headers: new Headers({ 'Content-Type': 'application/json' }),
       })
-
       expect(res.status).toBe(200)
+
       const body = await res.json()
       expect(body).toHaveProperty('message', 'success')
     })
 
-    test('Should return 400 if student not found', async () => {
+    it('should throw an error 409 if NISN conflicted', async () => {
+      const res = await app.request(`/api/students/${createdStudentId}`, {
+        method: 'PUT',
+        body: JSON.stringify(studentWithConflictedNISN),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+      })
+      expect(res.status).toBe(409)
+
+      const body = await res.json()
+      expect(body).toHaveProperty('message', 'NISN already used')
+    })
+
+    it('should throw an error 400 if student not found', async () => {
       const updatedStudent = {
-        nama: 'Nonexistent Student',
-        NISN: '987654321',
-        jenis_kelamin: 'Perempuan',
+        nama: faker.person.fullName(),
+        NISN: faker.string.numeric(8),
+        jenis_kelamin: 'male',
       }
 
       const res = await app.request('/api/students/9999', {
@@ -89,8 +118,8 @@ describe('Student API Tests', () => {
     })
   })
 
-  describe('DELETE /api/students/:id', () => {
-    test('Should delete a student', async () => {
+  describe('delete /api/students/:id', () => {
+    it('should delete a student', async () => {
       const res = await app.request(`/api/students/${createdStudentId}`, {
         method: 'DELETE',
       })
@@ -99,7 +128,7 @@ describe('Student API Tests', () => {
       expect(body).toHaveProperty('message', 'success')
     })
 
-    test('Should return 400 if student not found', async () => {
+    it('should throw an error 400 if student not found', async () => {
       const res = await app.request('/api/students/9999', {
         method: 'DELETE',
       })
