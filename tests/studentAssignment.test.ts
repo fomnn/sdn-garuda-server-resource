@@ -5,7 +5,7 @@ import app from '../src/app.js'
 
 let createdStudentAssignmentId: number
 
-describe('student grades API tests', () => {
+describe('student assignment API tests', () => {
   const newStudentAssignment: Omit<student_assignments, 'id' | 'date' | 'deadline_date'> & { date: string, deadline_date: string } = {
     date: new Date(faker.date.anytime().toISOString().split('T')[0]).toISOString(),
     deadline_date: new Date(faker.date.soon().toISOString().split('T')[0]).toISOString(),
