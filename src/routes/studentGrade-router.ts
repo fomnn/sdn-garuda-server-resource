@@ -19,6 +19,12 @@ studentGradeRouter
       },
     })
 
+    if (!studentGrade) {
+      return c.json({
+        message: 'Student grade not found',
+      }, 404)
+    }
+
     return c.json({ student_grade: studentGrade })
   })
 
@@ -38,7 +44,11 @@ studentGradeRouter
         term,
       },
     })
-    return c.json({ message: 'success' })
+
+    return c.json({
+      message: 'Created',
+      student_grade: studentGrade,
+    })
   })
 
   // PUT /api/student_grades/:id
@@ -50,7 +60,18 @@ studentGradeRouter
       grade,
       term,
     } = await c.req.json()
-    const studentGrade = await prisma.student_grades.update({
+    let studentGrade = await prisma.student_grades.findFirst({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+
+    if (!studentGrade) {
+      return c.json({
+        message: 'Student grade not found',
+      }, 404)
+    }
+    studentGrade = await prisma.student_grades.update({
       where: {
         id: Number.parseInt(id),
       },
@@ -61,18 +82,35 @@ studentGradeRouter
         term,
       },
     })
-    return c.json({ message: 'success' })
+    return c.json({
+      message: 'Updated',
+      student_grade: studentGrade,
+    })
   })
 
   // DELETE /api/student_grades/:id
   .delete('/:id', async (c) => {
     const id = c.req.param('id')
-    const studentGrade = await prisma.student_grades.delete({
+    let studentGrade = await prisma.student_grades.findFirst({
       where: {
         id: Number.parseInt(id),
       },
     })
-    return c.json({ message: 'success' })
+
+    if (!studentGrade) {
+      return c.json({
+        message: 'Student grade not found',
+      }, 404)
+    }
+    studentGrade = await prisma.student_grades.delete({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+    return c.json({ 
+      message: 'Deleted',
+      student_grade: studentGrade
+    })
   })
 
 export default studentGradeRouter
