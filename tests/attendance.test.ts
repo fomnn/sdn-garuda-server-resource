@@ -99,7 +99,7 @@ describe('attendance API tests', () => {
   })
 
   describe('delete /api/attendances/:id', () => {
-    it('should delete a attendace', async () => {
+    it('should delete a attendance', async () => {
       const res = await app.request(`/api/attendances/${createdAttendanceId}`, {
         method: 'DELETE',
       })

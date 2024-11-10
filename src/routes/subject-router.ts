@@ -21,6 +21,12 @@ subjectRouter
       },
     })
 
+    if (!subject) {
+      return c.json({
+        message: 'Subject not found',
+      }, 400)
+    }
+
     return c.json({ subject })
   })
 
@@ -30,13 +36,16 @@ subjectRouter
       subject_name,
     } = await c.req.json()
 
-    await prisma.subjects.create({
+    const subject = await prisma.subjects.create({
       data: {
         subject_name,
       },
     })
 
-    return c.json({ message: 'Created' })
+    return c.json({
+      message: 'Created',
+      subject,
+    })
   })
 
   // PUT /api/subjects/:id
@@ -46,7 +55,19 @@ subjectRouter
       subject_name,
     } = await c.req.json()
 
-    const subject = await prisma.subjects.update({
+    let subject = await prisma.subjects.findFirst({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+
+    if (!subject) {
+      return c.json({
+        message: 'Subject not found',
+      }, 400)
+    }
+
+    subject = await prisma.subjects.update({
       where: {
         id: Number.parseInt(id),
       },
@@ -55,19 +76,38 @@ subjectRouter
       },
     })
 
-    return c.json({ message: 'Updated' })
+    return c.json({
+      message: 'Updated',
+      subject,
+    })
   })
 
   // DELETE /api/subjects/:id
   .delete('/:id', async (c) => {
     const id = c.req.param('id')
-    const subject = await prisma.subjects.delete({
+
+    let subject = await prisma.subjects.findFirst({
       where: {
         id: Number.parseInt(id),
       },
     })
 
-    return c.json({ message: 'deleted', subject })
+    if (!subject) {
+      return c.json({
+        message: 'Subject not found',
+      }, 400)
+    }
+
+    subject = await prisma.subjects.delete({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+
+    return c.json({
+      message: 'Deleted',
+      subject,
+    })
   })
 
 export default subjectRouter
