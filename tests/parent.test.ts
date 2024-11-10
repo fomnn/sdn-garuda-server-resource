@@ -41,7 +41,6 @@ describe('parent API Tests', () => {
 
       const body = await res.json()
       expect(body).toHaveProperty('parents')
-      expectTypeOf(body.parents)
     })
   })
 
