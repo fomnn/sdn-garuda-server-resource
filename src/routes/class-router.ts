@@ -25,7 +25,7 @@ classRouter
     if (!classData) {
       return c.json({
         message: 'Class not found',
-      }, 400)
+      }, 404)
     }
 
     return c.json({
@@ -64,7 +64,7 @@ classRouter
     if (!classData) {
       return c.json({
         message: "Class not found"
-      }, 400)
+      }, 404)
     }
     classData = await prisma.classes.delete({
       where: {
@@ -95,7 +95,7 @@ classRouter
     if (!classData) {
       return c.json({
         message: 'Class not found'
-      }, 400)
+      }, 404)
     }
 
     classData = await prisma.classes.update({

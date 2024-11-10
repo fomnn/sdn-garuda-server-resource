@@ -27,7 +27,7 @@ authenticationRouter
     if (!['parent', 'teacher', 'principal'].includes(role)) {
       return c.json({
         message: `There is no role ${role}!`,
-      }, 400)
+      }, 404)
     }
 
     // mengambil data dari table account
@@ -51,7 +51,7 @@ authenticationRouter
         if (!teacher) {
           return c.json({
             message: 'Teacher not found',
-          }, 400)
+          }, 404)
         }
 
         const account = await prisma.accounts.create({
@@ -87,7 +87,7 @@ authenticationRouter
         if (!parent) {
           return c.json({
             message: 'Parent not found',
-          }, 400)
+          }, 404)
         }
 
         const account = await prisma.accounts.create({
@@ -123,7 +123,7 @@ authenticationRouter
         if (!principal) {
           return c.json({
             message: 'Principal not found',
-          }, 400)
+          }, 404)
         }
 
         const account = await prisma.accounts.create({
@@ -154,7 +154,7 @@ authenticationRouter
     if (account.password !== password) {
       return c.json({
         message: 'Wrong password',
-      }, 400)
+      }, 404)
     }
 
     if (account.type === 'teacher') {

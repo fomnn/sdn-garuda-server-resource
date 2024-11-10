@@ -49,7 +49,7 @@ async function main() {
   await prisma.parents.createMany({
     data: [
       { nama: 'Parent One', email: 'parent_one@example.com', tahun_lahir: 1970, jenjang_pendidikan: 'Bachelor', pekerjaan: 'Engineer', penghasilan: '5000000', NIK: '123456789' },
-      { nama: 'Parent Two', email: 'parent_two@example.com', tahun_lahir: 1975, jenjang_pendidikan: 'Bachelor', pekerjaan: 'Teacher', penghasilan: '4000000', NIK: '987654321' },
+      { nama: 'Parent Two', email: 'parent_two@example.com', tahun_lahir: 1975, jenjang_pendidikan: 'Bachelor', pekerjaan: 'Teacher', penghasilan: '4040000', NIK: '987654321' },
       { nama: 'Parent Three', email: 'parent_three@example.com', tahun_lahir: 1980, jenjang_pendidikan: 'Master', pekerjaan: 'Doctor', penghasilan: '6000000', NIK: '123459876' },
       { nama: 'Parent Four', email: 'parent_four@example.com', tahun_lahir: 1985, jenjang_pendidikan: 'Diploma', pekerjaan: 'Lawyer', penghasilan: '7000000', NIK: '987651234' },
       { nama: 'Parent Five', email: 'parent_five@example.com', tahun_lahir: 1990, jenjang_pendidikan: 'PhD', pekerjaan: 'Scientist', penghasilan: '8000000', NIK: '1122334455' },

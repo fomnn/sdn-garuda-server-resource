@@ -26,7 +26,7 @@ studentRouter
     if (!student) {
       return c.json({
         message: 'Student not found',
-      }, 400)
+      }, 404)
     }
 
     return c.json({ student })
@@ -96,7 +96,7 @@ studentRouter
     if (!student) {
       return c.json({
         message: 'Student not found',
-      }, 400)
+      }, 404)
     }
 
     student = await prisma.students.update({
@@ -125,7 +125,7 @@ studentRouter
     if (!student) {
       return c.json({
         message: 'Student not found',
-      }, 400)
+      }, 404)
     }
 
     await prisma.students.delete({

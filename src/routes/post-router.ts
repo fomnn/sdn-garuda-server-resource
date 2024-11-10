@@ -21,7 +21,7 @@ postRouter
     if (!post) {
       return c.json({
         message: 'Post not found',
-      }, 400)
+      }, 404)
     }
 
     return c.json({
@@ -63,7 +63,7 @@ postRouter
     if (!post) {
       return c.json({
         message: 'Post not found',
-      }, 400)
+      }, 404)
     }
 
     await prisma.posts.update({
@@ -93,7 +93,7 @@ postRouter
     if (!post) {
       return c.json({
         message: 'Post not found',
-      }, 400)
+      }, 404)
     }
 
     await prisma.posts.delete({

@@ -39,9 +39,9 @@ describe('attendance API tests', () => {
       expect(body).toHaveProperty('attendance')
     })
 
-    it('should throw an error 400 if not found', async () => {
+    it('should throw an error 404 if not found', async () => {
       const res = await app.request('/api/attendances/9999')
-      expect(res.status).toBe(400)
+      expect(res.status).toBe(404)
 
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Attendance not found')
@@ -85,13 +85,13 @@ describe('attendance API tests', () => {
       })
     })
 
-    it('should throw an error 400 if not found', async () => {
+    it('should throw an error 404 if not found', async () => {
       const res = await app.request('/api/attendances/9999', {
         method: 'PUT',
         body: JSON.stringify(updatedAttendance),
         headers: new Headers({ 'Content-Type': 'application/json' }),
       })
-      expect(res.status).toBe(400)
+      expect(res.status).toBe(404)
 
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Attendance not found')
@@ -113,11 +113,11 @@ describe('attendance API tests', () => {
       })
     })
 
-    it('should throw an error 400 if not found', async () => {
+    it('should throw an error 404 if not found', async () => {
       const res2 = await app.request('/api/attendances/9999', {
         method: 'DELETE',
       })
-      expect(res2.status).toBe(400)
+      expect(res2.status).toBe(404)
     })
   })
 })

@@ -24,7 +24,7 @@ subjectRouter
     if (!subject) {
       return c.json({
         message: 'Subject not found',
-      }, 400)
+      }, 404)
     }
 
     return c.json({ subject })
@@ -64,7 +64,7 @@ subjectRouter
     if (!subject) {
       return c.json({
         message: 'Subject not found',
-      }, 400)
+      }, 404)
     }
 
     subject = await prisma.subjects.update({
@@ -95,7 +95,7 @@ subjectRouter
     if (!subject) {
       return c.json({
         message: 'Subject not found',
-      }, 400)
+      }, 404)
     }
 
     subject = await prisma.subjects.delete({

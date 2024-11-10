@@ -26,7 +26,7 @@ teacherRouter
     if (!teacher) {
       return c.json({
         message: 'Teacher not found',
-      }, 400)
+      }, 404)
     }
 
     return c.json({ teacher })
@@ -94,7 +94,7 @@ teacherRouter
     if (!teacher) {
       return c.json({
         message: 'Teacher not found',
-      }, 400)
+      }, 404)
     }
 
     teacher = await prisma.teachers.findFirst({
@@ -152,7 +152,7 @@ teacherRouter
     if (!teacher) {
       return c.json({
         message: 'Teacher not found',
-      }, 400)
+      }, 404)
     }
 
     await prisma.teachers.delete({

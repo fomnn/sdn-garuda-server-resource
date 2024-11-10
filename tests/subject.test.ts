@@ -32,9 +32,9 @@ describe('subject API tests', () => {
       expect(body).toHaveProperty('subject')
     })
 
-    it('should throw an error 400 if not found', async () => {
+    it('should throw an error 404 if not found', async () => {
       const res = await app.request('/api/subjects/9999')
-      expect(res.status).toBe(400)
+      expect(res.status).toBe(404)
 
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Subject not found')
@@ -73,13 +73,13 @@ describe('subject API tests', () => {
       expect(body.subject).toMatchObject<Omit<subjects, 'id'>>(updatedSubject)
     })
 
-    it('should throw an error 400 if not found', async () => {
+    it('should throw an error 404 if not found', async () => {
       const res = await app.request('/api/subjects/9999', {
         method: 'PUT',
         body: JSON.stringify(updatedSubject),
         headers: new Headers({ 'Content-Type': 'application/json' }),
       })
-      expect(res.status).toBe(400)
+      expect(res.status).toBe(404)
 
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Subject not found')
@@ -98,11 +98,11 @@ describe('subject API tests', () => {
       expect(body.subject).toMatchObject<Omit<subjects, 'id'>>(updatedSubject)
     })
 
-    it('should throw an error 400 if not found', async () => {
+    it('should throw an error 404 if not found', async () => {
       const res2 = await app.request('/api/subjects/9999', {
         method: 'DELETE',
       })
-      expect(res2.status).toBe(400)
+      expect(res2.status).toBe(404)
     })
   })
 })

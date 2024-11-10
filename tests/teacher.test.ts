@@ -50,9 +50,9 @@ describe('teacher API Tests', () => {
       expect(body).toHaveProperty('teacher')
     })
 
-    it('should throw error 400 if not found', async () => {
+    it('should throw error 404 if not found', async () => {
       const res = await app.request('/api/teachers/9999')
-      expect(res.status).toBe(400)
+      expect(res.status).toBe(404)
     })
   })
 
@@ -114,13 +114,13 @@ describe('teacher API Tests', () => {
       expect(body.message).toBe('email, NIP, or NUPTK is conflicted')
     })
 
-    it('should throw an error 400 if not found', async () => {
+    it('should throw an error 404 if not found', async () => {
       const res = await app.request('/api/teachers/9999', {
         method: 'PUT',
         body: JSON.stringify(updatedTeacher),
         headers: new Headers({ 'Content-Type': 'application/json' }),
       })
-      expect(res.status).toBe(400)
+      expect(res.status).toBe(404)
 
       const body = await res.json()
       expect(body.message).toBe('Teacher not found')
@@ -139,11 +139,11 @@ describe('teacher API Tests', () => {
       expect(body).toHaveProperty('teacher')
     })
 
-    it('should throw an error 400 if not found', async () => {
+    it('should throw an error 404 if not found', async () => {
       const res = await app.request('/api/teachers/9999', {
         method: 'DELETE',
       })
-      expect(res.status).toBe(400)
+      expect(res.status).toBe(404)
 
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Teacher not found')

@@ -21,7 +21,7 @@ parentRouter
     })
 
     if (!parent) {
-      return c.json({ message: 'Parent not found' }, 400)
+      return c.json({ message: 'Parent not found' }, 404)
     }
 
     const students = await prisma.students.findMany({
@@ -73,7 +73,10 @@ parentRouter
       },
     })
 
-    return c.json({ message: 'Created', parent })
+    return c.json({
+      message: 'Created',
+      parent,
+    })
   })
 
   // DELETE /api/parents/:id
@@ -87,7 +90,7 @@ parentRouter
     })
 
     if (!parent) {
-      return c.json({ message: 'Parent not found' }, 400)
+      return c.json({ message: 'Parent not found' }, 404)
     }
 
     await prisma.parents.delete({
@@ -121,7 +124,7 @@ parentRouter
     if (!parent) {
       return c.json({
         message: 'Parent not found',
-      }, 400)
+      }, 404)
     }
 
     const emailConflicted = await prisma.parents.findUnique({

@@ -39,9 +39,9 @@ describe('student API Tests', () => {
       expect(body).toHaveProperty('student')
     })
 
-    it('should throw an error 400 if student not found', async () => {
+    it('should throw an error 404 if student not found', async () => {
       const res = await app.request('/api/students/500') // ID yang tidak ada
-      expect(res.status).toBe(400)
+      expect(res.status).toBe(404)
     })
   })
 
@@ -101,7 +101,7 @@ describe('student API Tests', () => {
       expect(body).toHaveProperty('message', 'NISN already used')
     })
 
-    it('should throw an error 400 if student not found', async () => {
+    it('should throw an error 404 if student not found', async () => {
       const updatedStudent = {
         nama: faker.person.fullName(),
         NISN: faker.string.numeric(8),
@@ -114,7 +114,7 @@ describe('student API Tests', () => {
         headers: new Headers({ 'Content-Type': 'application/json' }),
       })
 
-      expect(res.status).toBe(400)
+      expect(res.status).toBe(404)
     })
   })
 
@@ -128,11 +128,11 @@ describe('student API Tests', () => {
       expect(body).toHaveProperty('message', 'success')
     })
 
-    it('should throw an error 400 if student not found', async () => {
+    it('should throw an error 404 if student not found', async () => {
       const res = await app.request('/api/students/9999', {
         method: 'DELETE',
       })
-      expect(res.status).toBe(400)
+      expect(res.status).toBe(404)
     })
   })
 })

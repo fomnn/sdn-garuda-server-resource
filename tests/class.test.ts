@@ -35,9 +35,9 @@ describe('class API Tests', () => {
       expect(body).toHaveProperty('class')
     })
 
-    it('should throw an error 400 if not found', async () => {
+    it('should throw an error 404 if not found', async () => {
       const res = await app.request('/api/classes/9999')
-      expect(res.status).toBe(400)
+      expect(res.status).toBe(404)
 
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Class not found')
@@ -74,13 +74,13 @@ describe('class API Tests', () => {
       expect(body.class).toMatchObject<Omit<classes, 'id'>>(updatedClass)
     })
 
-    it('should throw an error 400 if not found', async () => {
+    it('should throw an error 404 if not found', async () => {
       const res = await app.request('/api/classes/9999', {
         method: 'PUT',
         body: JSON.stringify(updatedClass),
         headers: new Headers({ 'Content-Type': 'application/json' }),
       })
-      expect(res.status).toBe(400)
+      expect(res.status).toBe(404)
       
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Class not found')
@@ -99,11 +99,11 @@ describe('class API Tests', () => {
       expect(body.class).toMatchObject<Omit<classes, 'id'>>(updatedClass)
     })
 
-    it('should throw an error 400 if not found', async () => {
+    it('should throw an error 404 if not found', async () => {
       const res2 = await app.request('/api/classes/9999', {
         method: 'DELETE',
       })
-      expect(res2.status).toBe(400)
+      expect(res2.status).toBe(404)
     })
   })
 })

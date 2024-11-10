@@ -55,9 +55,9 @@ describe('parent API Tests', () => {
       expect(body).toHaveProperty('students')
     })
 
-    it('should throw an error 400 if parent not found', async () => {
+    it('should throw an error 404 if parent not found', async () => {
       const res = await app.request('/api/parents/500')
-      expect(res.status).toBe(400)
+      expect(res.status).toBe(404)
 
       const body = await res.json()
       expect(body.message).toBe('Parent not found')
@@ -116,13 +116,13 @@ describe('parent API Tests', () => {
       expect(res.status).toBe(409)
     })
 
-    it('should throw an error 400 if parent not found', async () => {
+    it('should throw an error 404 if parent not found', async () => {
       const res = await app.request('/api/parents/500', {
         method: 'PUT',
         body: JSON.stringify(updatedParent),
         headers: new Headers({ 'Content-Type': 'application/json' }),
       })
-      expect(res.status).toBe(400)
+      expect(res.status).toBe(404)
 
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Parent not found')
@@ -141,11 +141,11 @@ describe('parent API Tests', () => {
       expect(body.parent).toMatchObject<Omit<parents, 'id'>>(updatedParent)
     })
 
-    it('should throw an error 400 if parent not found', async () => {
+    it('should throw an error 404 if parent not found', async () => {
       const res2 = await app.request('/api/parents/9999', {
         method: 'DELETE',
       })
-      expect(res2.status).toBe(400)
+      expect(res2.status).toBe(404)
     })
   })
 })

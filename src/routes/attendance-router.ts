@@ -23,7 +23,7 @@ attendanceRouter
     if (!attendance) {
       return c.json({
         message: 'Attendance not found',
-      }, 400)
+      }, 404)
     }
 
     return c.json({ attendance })
@@ -70,7 +70,7 @@ attendanceRouter
     if (!attendance) {
       return c.json({
         message: 'Attendance not found',
-      }, 400)
+      }, 404)
     }
     attendance = await prisma.attendances.update({
       where: {
@@ -102,7 +102,7 @@ attendanceRouter
     if (!attendance) {
       return c.json({
         message: 'Attendance not found',
-      }, 400)
+      }, 404)
     }
     attendance = await prisma.attendances.delete({
       where: {

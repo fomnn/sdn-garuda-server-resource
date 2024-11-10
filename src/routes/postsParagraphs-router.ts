@@ -24,7 +24,7 @@ postsParagraphsRouter
     if (!postParagraph) {
       return c.json({
         message: 'Post Paragraph not found',
-      }, 400)
+      }, 404)
     }
 
     return c.json({
@@ -70,7 +70,7 @@ postsParagraphsRouter
     if (!postParagraph2) {
       return c.json({
         message: 'Post Paragraph not found',
-      }, 400)
+      }, 404)
     }
 
     const postParagraph = await prisma.posts_paragraphs.update({
@@ -101,7 +101,7 @@ postsParagraphsRouter
     if (!postParagraph) {
       return c.json({
         message: 'Post Paragraph not found',
-      }, 400)
+      }, 404)
     }
 
     await prisma.posts_paragraphs.delete({
