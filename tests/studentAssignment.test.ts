@@ -25,7 +25,7 @@ describe('student assignment API tests', () => {
       expect(res.status).toBe(200)
 
       const body = await res.json()
-      expect(body).toHaveProperty('student_assignments')
+      expect(body).toHaveProperty('students_assignments')
     })
   })
 
