@@ -6,6 +6,9 @@ import authenticationRouter from './routes/authentication-router.js'
 import classRouter from './routes/class-router.js'
 import feedbackRouter from './routes/feedback-router.js'
 import parentRouter from './routes/parent-router.js'
+import parentsStudentsRouter from './routes/parentsStudents-router.js'
+import postRouter from './routes/post-router.js'
+import postsParagraphsRouter from './routes/postsParagraphs-router.js'
 import studentRouter from './routes/student-router.js'
 import StudentAssignmentRouter from './routes/studentAssignment-router.js'
 import studentGradeRouter from './routes/studentGrade-router.js'
@@ -61,5 +64,8 @@ app.route('/student-assignments', StudentAssignmentRouter)
 app.route('/student-grades', studentGradeRouter)
 app.route('/feedbacks', feedbackRouter)
 app.route('/accounts', accountRouter)
+app.route('/posts', postRouter)
+app.route('/posts-paragraphs', postsParagraphsRouter)
+app.route('/parents-students', parentsStudentsRouter)
 
 export default app
