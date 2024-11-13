@@ -1,126 +1,153 @@
+import { faker } from '@faker-js/faker'
+import { account_type, attendance_status, jenis_kelamin, parent_student_relationships } from '@prisma/client'
 import { prisma } from './db.js'
 
 async function main() {
   // Seeding data for `superadmin`
   await prisma.superadmin.createMany({
-    data: [
-      { username: 'admin1', password: 'password1' },
-      { username: 'admin2', password: 'password2' },
-      { username: 'admin3', password: 'password3' },
-      { username: 'admin4', password: 'password4' },
-      { username: 'admin5', password: 'password5' },
-    ],
-  })
-
-  // Seeding data for `account`
-  await prisma.accounts.createMany({
-    data: [
-      { email: 'parent1@example.com', password: 'password', type: 'parent', user_id: 1 },
-      { email: 'teacher1@example.com', password: 'password', type: 'teacher', user_id: 2 },
-      { email: 'principal1@example.com', password: 'password', type: 'principal', user_id: 3 },
-      { email: 'parent2@example.com', password: 'password', type: 'parent', user_id: 4 },
-      { email: 'teacher2@example.com', password: 'password', type: 'teacher', user_id: 5 },
-    ],
+    data: Array.from({ length: 5 }).fill(null).map(() => ({
+      username: faker.internet.username(),
+      password: faker.internet.password(),
+    })),
   })
 
   // Seeding data for `teachers`
   await prisma.teachers.createMany({
-    data: [
-      { nama: 'Teacher One', email: 'teacher1@example.com', jenis_kelamin: 'male', NIP: '12345', NUPTK: '54321' },
-      { nama: 'Teacher Two', email: 'teacher2@example.com', jenis_kelamin: 'female', NIP: '23456', NUPTK: '65432' },
-      { nama: 'Teacher Three', email: 'teacher3@example.com', jenis_kelamin: 'male', NIP: '34567', NUPTK: '76543' },
-      { nama: 'Teacher Four', email: 'teacher4@example.com', jenis_kelamin: 'female', NIP: '45678', NUPTK: '87654' },
-      { nama: 'Teacher Five', email: 'teacher5@example.com', jenis_kelamin: 'male', NIP: '56789', NUPTK: '98765' },
-    ],
+    data: Array.from({ length: 5 }).fill(null).map(() => ({
+      email: faker.internet.email(),
+      jenis_kelamin: faker.helpers.enumValue(jenis_kelamin),
+      nama: faker.person.fullName(),
+      NIP: faker.string.numeric(8),
+      tanggal_lahir: faker.date.past(),
+      NUPTK: faker.string.numeric(10),
+    })),
   })
 
   // Seeding data for `classes`
   await prisma.classes.createMany({
-    data: [
-      { class_name: 'Class 1', teacher_id: 1 },
-      { class_name: 'Class 2', teacher_id: 2 },
-      { class_name: 'Class 3', teacher_id: 3 },
-      { class_name: 'Class 4', teacher_id: 4 },
-      { class_name: 'Class 5', teacher_id: 5 },
-    ],
+    data: Array.from({ length: 5 }).fill(null).map(() => ({
+      class_name: faker.lorem.words({ min: 1, max: 4 }),
+      teacher_id: faker.number.int({ min: 1, max: 5 }),
+    })),
   })
 
   // Seeding data for `parents`
   await prisma.parents.createMany({
-    data: [
-      { nama: 'Parent One', email: 'parent_one@example.com', tahun_lahir: 1970, jenjang_pendidikan: 'Bachelor', pekerjaan: 'Engineer', penghasilan: '5000000', NIK: '123456789' },
-      { nama: 'Parent Two', email: 'parent_two@example.com', tahun_lahir: 1975, jenjang_pendidikan: 'Bachelor', pekerjaan: 'Teacher', penghasilan: '4040000', NIK: '987654321' },
-      { nama: 'Parent Three', email: 'parent_three@example.com', tahun_lahir: 1980, jenjang_pendidikan: 'Master', pekerjaan: 'Doctor', penghasilan: '6000000', NIK: '123459876' },
-      { nama: 'Parent Four', email: 'parent_four@example.com', tahun_lahir: 1985, jenjang_pendidikan: 'Diploma', pekerjaan: 'Lawyer', penghasilan: '7000000', NIK: '987651234' },
-      { nama: 'Parent Five', email: 'parent_five@example.com', tahun_lahir: 1990, jenjang_pendidikan: 'PhD', pekerjaan: 'Scientist', penghasilan: '8000000', NIK: '1122334455' },
-    ],
+    data: Array.from({ length: 5 }).fill(null).map(() => ({
+      nama: faker.person.fullName(),
+      email: faker.internet.email(),
+      jenjang_pendidikan: faker.lorem.words({ min: 1, max: 4 }),
+      NIK: faker.string.numeric(16),
+      pekerjaan: faker.lorem.words(3),
+      penghasilan: faker.string.numeric(7),
+    })),
   })
 
   // Seeding data for `feedbacks`
   await prisma.feedbacks.createMany({
-    data: [
-      { feedback_text: 'Great teacher', rating: 5, date: new Date(), teacher_id: 1, parent_id: 1 },
-      { feedback_text: 'Good teacher', rating: 4, date: new Date(), teacher_id: 2, parent_id: 2 },
-      { feedback_text: 'Average teacher', rating: 3, date: new Date(), teacher_id: 3, parent_id: 3 },
-      { feedback_text: 'Not satisfied', rating: 2, date: new Date(), teacher_id: 4, parent_id: 4 },
-      { feedback_text: 'Excellent', rating: 5, date: new Date(), teacher_id: 5, parent_id: 5 },
-    ],
+    data: Array.from({ length: 5 }).fill(null).map(() => ({
+      date: faker.date.past(),
+      feedback_text: faker.lorem.paragraph(),
+      rating: faker.number.int({ min: 1, max: 5 }),
+      parent_id: faker.number.int({ min: 1, max: 5 }),
+      teacher_id: faker.number.int({ min: 1, max: 5 }),
+    })),
   })
 
   // Seeding data for `students`
   await prisma.students.createMany({
-    data: [
-      { nama: 'Student One', jenis_kelamin: 'male', NISN: 'S123456' },
-      { nama: 'Student Two', jenis_kelamin: 'female', NISN: 'S234567' },
-      { nama: 'Student Three', jenis_kelamin: 'male', NISN: 'S345678' },
-      { nama: 'Student Four', jenis_kelamin: 'female', NISN: 'S456789' },
-      { nama: 'Student Five', jenis_kelamin: 'male', NISN: 'S567890' },
-    ],
+    data: Array.from({ length: 5 }).fill(null).map(() => ({
+      nama: faker.person.fullName(),
+      NISN: faker.string.numeric(8),
+      jenis_kelamin: faker.helpers.enumValue(jenis_kelamin),
+      class_id: faker.number.int({ min: 1, max: 5 }),
+    })),
   })
 
   // Seeding data for `subjects`
   await prisma.subjects.createMany({
-    data: [
-      { subject_name: 'Mathematics' },
-      { subject_name: 'Science' },
-      { subject_name: 'History' },
-      { subject_name: 'Geography' },
-      { subject_name: 'English' },
-    ],
+    data: Array.from({ length: 5 }).fill(null).map(() => ({
+      subject_name: faker.lorem.words(3),
+    })),
   })
 
   // Seeding data for `class_subjects`
   await prisma.class_subjects.createMany({
-    data: [
-      { class_id: 1, subject_id: 1 },
-      { class_id: 2, subject_id: 2 },
-      { class_id: 3, subject_id: 3 },
-      { class_id: 4, subject_id: 4 },
-      { class_id: 5, subject_id: 5 },
-    ],
+    data: Array.from({ length: 3 }).fill(null).map(() => ({
+      class_id: faker.number.int({ min: 1, max: 5 }),
+      subject_id: faker.number.int({ min: 1, max: 5 }),
+    })),
   })
 
   // Seeding data for `parents_students`
   await prisma.parents_students.createMany({
-    data: [
-      { parent_id: 1, student_id: 1, relationship: 'father' },
-      { parent_id: 2, student_id: 2, relationship: 'mother' },
-      { parent_id: 3, student_id: 3, relationship: 'guardian' },
-      { parent_id: 4, student_id: 4, relationship: 'father' },
-      { parent_id: 5, student_id: 5, relationship: 'mother' },
-    ],
+    data: Array.from({ length: 5 }).fill(null).map(() => ({
+      relationship: faker.helpers.enumValue(parent_student_relationships),
+      student_id: faker.number.int({ min: 1, max: 5 }),
+      parent_id: faker.number.int({ min: 1, max: 5 }),
+    })),
   })
 
   // Seeding data for `attendances`
   await prisma.attendances.createMany({
-    data: [
-      { student_id: 1, class_id: 1, date: new Date(), status: 'present' },
-      { student_id: 2, class_id: 2, date: new Date(), status: 'absent' },
-      { student_id: 3, class_id: 3, date: new Date(), status: 'excused' },
-      { student_id: 4, class_id: 4, date: new Date(), status: 'present' },
-      { student_id: 5, class_id: 5, date: new Date(), status: 'present' },
-    ],
+    data: Array.from({ length: 5 }).fill(null).map(() => ({
+      status: faker.helpers.enumValue(attendance_status),
+      date: faker.date.past(),
+      student_id: faker.number.int({ min: 1, max: 5 }),
+      class_id: faker.number.int({ min: 1, max: 5 }),
+    })),
   })
+
+  await prisma.student_assignments.createMany({
+    data: Array.from({ length: 5 }).fill(null).map(() => ({
+      deadline_date: faker.date.soon(),
+      date: new Date(faker.date.anytime().toISOString().split('T')[0]),
+      title: faker.lorem.words({ min: 1, max: 6 }),
+      subject_id: faker.number.int({ min: 1, max: 5 }),
+    })),
+  })
+
+  await prisma.student_grades.createMany({
+    data: Array.from({ length: 5 }).fill(null).map(() => ({
+      grade: faker.number.int({ min: 1, max: 100 }),
+      term: faker.lorem.paragraphs(),
+      student_id: faker.number.int({ min: 1, max: 5 }),
+      student_assignment_id: faker.number.int({ min: 1, max: 5 }),
+    })),
+  })
+
+  await prisma.subject_teachers.createMany({
+    data: Array.from({ length: 5 }).fill(null).map(() => ({
+      subject_id: faker.number.int({ min: 1, max: 5 }),
+      teacher_id: faker.number.int({ min: 1, max: 5 }),
+    })),
+  })
+
+  // Seeding data for `account`
+  await prisma.accounts.createMany({
+    data: Array.from({ length: 5 }).fill(null).map(() => ({
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+      type: faker.helpers.enumValue(account_type),
+      user_id: faker.number.int({ min: 1, max: 5 }),
+    })),
+  })
+
+  await prisma.posts.createMany({
+    data: Array.from({ length: 5 }).fill(null).map(() => ({
+      title: faker.lorem.words(),
+    })),
+  })
+
+  await prisma.posts_paragraphs.createMany({
+    data: Array.from({ length: 15 }).fill(null).map(() => ({
+      content: faker.lorem.paragraph(),
+      paragraph_order: faker.number.int({ min: 1, max: 150 }),
+      post_id: faker.number.int({ min: 1, max: 5 }),
+    })),
+  })
+
+  
 }
 
 main()

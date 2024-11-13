@@ -16,6 +16,9 @@
     "hono": "^4.6.3",
     "node-xlsx": "^0.24.0"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "devDependencies": {
     "@antfu/eslint-config": "^3.8.0",
     "@faker-js/faker": "^9.2.0",
