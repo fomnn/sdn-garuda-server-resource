@@ -23,7 +23,6 @@ authenticationRouter
     } = await c.req.json()
 
     const jwtSecret = 'secret'
-
     if (!['parent', 'teacher', 'principal'].includes(role)) {
       return c.json({
         message: `There is no role ${role}!`,
@@ -211,6 +210,7 @@ authenticationRouter
     })
 
     if (!account) {
+      // only for typescript
       return
     }
 

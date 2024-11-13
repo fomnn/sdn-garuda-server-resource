@@ -7,8 +7,31 @@ const studentRouter = new Hono()
 studentRouter
   // GET /api/students
   .get('/', async (c) => {
-    // const student = await Student.find()
-    // return c.json(student)
+    const parentId = c.req.query('parentId')
+    const classId = c.req.query('classId')
+
+    if (parentId) {
+      const students = await prisma.students.findMany({
+        where: {
+          parents_students: {
+            some: {
+              parent_id: Number.parseInt(parentId),
+            },
+          },
+        },
+      })
+
+      return c.json({ students })
+    } else if (classId) {
+      const students = await prisma.students.findMany({
+        where: {
+          class_id: Number.parseInt(classId)
+        },
+      })
+
+      return c.json({ students })
+    }
+
     const students = await prisma.students.findMany()
 
     return c.json({ students })
@@ -38,6 +61,7 @@ studentRouter
       nama,
       NISN,
       jenis_kelamin,
+      class_id,
     } = await c.req.json()
 
     let student = await prisma.students.findUnique({
@@ -57,6 +81,7 @@ studentRouter
         nama,
         jenis_kelamin,
         NISN,
+        class_id,
       },
     })
 
@@ -73,6 +98,7 @@ studentRouter
       nama,
       NISN,
       jenis_kelamin,
+      class_id,
     } = await c.req.json()
 
     let student = await prisma.students.findFirst({
@@ -110,6 +136,7 @@ studentRouter
         nama,
         NISN,
         jenis_kelamin,
+        class_id,
       },
     })
 

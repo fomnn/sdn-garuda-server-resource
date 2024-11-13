@@ -8,7 +8,7 @@ postsParagraphsRouter
     const postsParagraphs = await prisma.posts_paragraphs.findMany()
 
     return c.json({
-      postsParagraphs,
+      posts_paragraphs: postsParagraphs,
     })
   })
 
@@ -28,7 +28,7 @@ postsParagraphsRouter
     }
 
     return c.json({
-      postParagraph,
+      post_paragraph: postParagraph,
     })
   })
 
@@ -49,7 +49,7 @@ postsParagraphsRouter
 
     return c.json({
       message: 'Created',
-      postParagraph,
+      post_paragraph: postParagraph,
     })
   })
 
@@ -61,38 +61,7 @@ postsParagraphsRouter
       paragraph_order,
     } = await c.req.json()
 
-    const postParagraph2 = await prisma.posts_paragraphs.findFirst({
-      where: {
-        id: Number.parseInt(id),
-      },
-    })
-
-    if (!postParagraph2) {
-      return c.json({
-        message: 'Post Paragraph not found',
-      }, 404)
-    }
-
-    const postParagraph = await prisma.posts_paragraphs.update({
-      where: {
-        id: Number.parseInt(id),
-      },
-      data: {
-        content,
-        paragraph_order,
-      },
-    })
-
-    return c.json({
-      message: 'Updated',
-      postParagraph,
-    })
-  })
-
-  .delete('/:id', async (c) => {
-    const id = c.req.param('id')
-
-    const postParagraph = await prisma.posts_paragraphs.findFirst({
+    let postParagraph = await prisma.posts_paragraphs.findFirst({
       where: {
         id: Number.parseInt(id),
       },
@@ -104,7 +73,38 @@ postsParagraphsRouter
       }, 404)
     }
 
-    await prisma.posts_paragraphs.delete({
+    postParagraph = await prisma.posts_paragraphs.update({
+      where: {
+        id: Number.parseInt(id),
+      },
+      data: {
+        content,
+        paragraph_order,
+      },
+    })
+
+    return c.json({
+      message: 'Updated',
+      post_paragraph: postParagraph,
+    })
+  })
+
+  .delete('/:id', async (c) => {
+    const id = c.req.param('id')
+
+    let postParagraph = await prisma.posts_paragraphs.findFirst({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+
+    if (!postParagraph) {
+      return c.json({
+        message: 'Post Paragraph not found',
+      }, 404)
+    }
+
+    postParagraph = await prisma.posts_paragraphs.delete({
       where: {
         id: Number.parseInt(id),
       },
@@ -112,6 +112,8 @@ postsParagraphsRouter
 
     return c.json({
       message: 'Deleted',
-      postParagraph,
+      post_paragraph: postParagraph,
     })
   })
+
+export default postsParagraphsRouter

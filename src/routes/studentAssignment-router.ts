@@ -7,7 +7,9 @@ StudentAssignmentRouter
   // GET /api/student-assignments
   .get('/', async (c) => {
     const studentAssignments = await prisma.student_assignments.findMany()
-    return c.json({ student_assignments: studentAssignments })
+    return c.json({ 
+      students_assignments: studentAssignments 
+    })
   })
 
   // GET /api/student-assignments/:id

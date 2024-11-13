@@ -7,7 +7,22 @@ const parentRouter = new Hono()
 parentRouter
   // GET /api/parents
   .get('/', async (c) => {
-    const parents = await prisma.parents.findMany()
+    const studentId = await c.req.query('studentId')
+    let parents
+    if (studentId) {
+      parents = await prisma.parents.findMany({
+        where: {
+          parents_students: {
+            some: {
+              student_id: Number.parseInt(studentId),
+            },
+          },
+        },
+      })
+    }
+    else {
+      parents = await prisma.parents.findMany()
+    }
 
     return c.json({ parents })
   })

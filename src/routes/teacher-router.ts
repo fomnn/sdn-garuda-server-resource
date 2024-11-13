@@ -7,8 +7,22 @@ const teacherRouter = new Hono()
 teacherRouter
   // GET /api/teachers
   .get('/', async (c) => {
-    // const teacher = await Teacher.find()
-    // return c.json(teacher)
+    const subjectId = c.req.query('subjectId')
+
+    if (subjectId) {
+      const teachers = await prisma.teachers.findMany({
+        where: {
+          subject_teachers: {
+            some: {
+              subject_id: Number.parseInt(subjectId),
+            },
+          },
+        },
+      })
+
+      return c.json({ teachers })
+    }
+
     const teachers = await prisma.teachers.findMany()
 
     return c.json({ teachers })

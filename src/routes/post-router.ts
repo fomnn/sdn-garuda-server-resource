@@ -34,7 +34,7 @@ postRouter
       image_path,
     } = await c.req.json()
 
-    await prisma.posts.create({
+    const post = await prisma.posts.create({
       data: {
         title,
         image_path,
@@ -43,6 +43,7 @@ postRouter
 
     return c.json({
       message: 'Created',
+      post,
     })
   })
 
@@ -54,7 +55,7 @@ postRouter
       image_path,
     } = await c.req.json()
 
-    const post = await prisma.posts.findFirst({
+    let post = await prisma.posts.findFirst({
       where: {
         id: Number.parseInt(id),
       },
@@ -66,7 +67,7 @@ postRouter
       }, 404)
     }
 
-    await prisma.posts.update({
+    post = await prisma.posts.update({
       data: {
         title,
         image_path,
@@ -78,13 +79,14 @@ postRouter
 
     return c.json({
       message: 'Updated',
+      post,
     })
   })
 
   .delete('/:id', async (c) => {
     const id = c.req.param('id')
 
-    const post = await prisma.posts.findFirst({
+    let post = await prisma.posts.findFirst({
       where: {
         id: Number.parseInt(id),
       },
@@ -96,7 +98,7 @@ postRouter
       }, 404)
     }
 
-    await prisma.posts.delete({
+    post = await prisma.posts.delete({
       where: {
         id: Number.parseInt(id),
       },
@@ -104,5 +106,8 @@ postRouter
 
     return c.json({
       message: 'Deleted',
+      post,
     })
   })
+
+export default postRouter

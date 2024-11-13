@@ -37,7 +37,10 @@ principalsRouter
       },
     })
 
-    return c.json({ principal })
+    return c.json({
+      message: 'Created',
+      principal,
+    })
   })
 
   // PUT /api/principals/:id
@@ -60,7 +63,10 @@ principalsRouter
       },
     })
 
-    return c.json({ principal })
+    return c.json({
+      message: 'Updated',
+      principal,
+    })
   })
 
   // DELETE /api/principals/:id
@@ -72,7 +78,10 @@ principalsRouter
       },
     })
 
-    return c.json({ principal })
+    return c.json({
+      message: 'Deleted',
+      principal,
+    })
   })
 
 export default principalsRouter

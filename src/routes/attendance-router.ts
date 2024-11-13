@@ -6,7 +6,20 @@ const attendanceRouter = new Hono()
 attendanceRouter
   // GET /api/attendances
   .get('/', async (c) => {
-    const attendances = await prisma.attendances.findMany()
+    const studentId = c.req.query('studentId')
+
+    let attendances
+
+    if (studentId) {
+      attendances = await prisma.attendances.findMany({
+        where: {
+          student_id: Number.parseInt(studentId),
+        },
+      })
+    }
+    else {
+      attendances = await prisma.attendances.findMany()
+    }
 
     return c.json({ attendances })
   })
