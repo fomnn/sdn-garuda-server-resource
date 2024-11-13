@@ -22,6 +22,7 @@ model classes {
   teacher_id     Int?
   attendance     attendances[]
   class_subjects class_subjects[]
+  students       students[]
   teachers       teachers?        @relation(fields: [teacher_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
@@ -70,13 +71,13 @@ enum account_type {
 }
 
 model parents_students {
+  id           Int                          @id @default(autoincrement())
   parent_id    Int
   student_id   Int
-  relationship parent_student_relationships?
-  parents      parents                       @relation(fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  students     students                      @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  relationship parent_student_relationships
+  parents      parents                      @relation(fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  students     students                     @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  @@id([parent_id, student_id])
   @@unique([parent_id, student_id], map: "parents_students_parent_id_student_id_idx")
 }
 
@@ -86,8 +87,8 @@ model student_grades {
   student_assignment_id Int
   grade                 Decimal             @db.Decimal(5, 2)
   term                  String
-  student_assignments   student_assignments @relation(fields: [student_assignment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  students              students            @relation(fields: [student_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  student_assignments   student_assignments @relation(fields: [student_assignment_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  students              students            @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model students {
@@ -95,9 +96,11 @@ model students {
   nama             String
   jenis_kelamin    jenis_kelamin
   NISN             String             @unique
+  class_id         Int
   attendance       attendances[]
   parents_students parents_students[]
   student_grades   student_grades[]
+  classes          classes            @relation(fields: [class_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model subject_teachers {
@@ -165,6 +168,7 @@ model posts {
   image_path String?
   created_at DateTime @default(now()) @db.Timestamptz()
   updated_at DateTime @updatedAt @db.Timestamptz()
+  post_paragraphs posts_paragraphs[]
 }
 
 model posts_paragraphs {
@@ -172,6 +176,7 @@ model posts_paragraphs {
   post_id         Int
   content         String
   paragraph_order Int
+  posts posts @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 enum agama {
