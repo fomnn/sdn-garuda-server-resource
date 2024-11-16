@@ -19,7 +19,6 @@ async function main() {
   await prisma.subject_teachers.deleteMany()
   await prisma.accounts.deleteMany()
   await prisma.posts.deleteMany()
-  await prisma.posts_paragraphs.deleteMany()
 
   // Seeding data for `superadmin`
   await prisma.superadmin.createMany({
@@ -44,7 +43,14 @@ async function main() {
   const teachers = await prisma.teachers.findMany()
   const teacherIds = teachers.map(teacher => teacher.id)
 
-  
+  await prisma.principals.create({
+    data: {
+      nama: faker.person.fullName(),
+      contact_number: faker.string.numeric(12),
+      email: faker.internet.email(),
+    },
+  })
+
   // Seeding data for `classes`
   await prisma.classes.createMany({
     data: Array.from({ length: 5 }).fill(null).map(() => ({
@@ -92,7 +98,6 @@ async function main() {
     })),
   })
 
-  
   const students = await prisma.students.findMany()
   const studentIds = students.map(student => student.id)
 
@@ -142,7 +147,6 @@ async function main() {
     })),
   })
 
-  
   const student_assignments = await prisma.student_assignments.findMany()
   const studentAssignmentIds = student_assignments.map(studentAssignment => studentAssignment.id)
 
@@ -175,18 +179,7 @@ async function main() {
   await prisma.posts.createMany({
     data: Array.from({ length: 5 }).fill(null).map(() => ({
       title: faker.lorem.words(),
-    })),
-  })
-
-  const posts = await prisma.posts.findMany()
-  const postIds = posts.map(post => post.id)
-
-
-  await prisma.posts_paragraphs.createMany({
-    data: Array.from({ length: 15 }).fill(null).map(() => ({
-      content: faker.lorem.paragraph(),
-      paragraph_order: faker.number.int({ min: 1, max: 150 }),
-      post_id: faker.helpers.arrayElement(postIds),
+      description: JSON.stringify(faker.lorem.paragraphs(5, '\n').split('\n')),
     })),
   })
 }

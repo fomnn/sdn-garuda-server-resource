@@ -29,56 +29,52 @@ postRouter
     })
   })
   .post('/', async (c) => {
-    const {
-      title,
-      image_path,
-    } = await c.req.json()
+    const formData = await c.req.formData()
+
+    const image = formData.get('image') as File
+    const title = formData.get('title') as string
+    const description = formData.get('description') as string
+
+    if (image) {
+      const formData2 = new FormData()
+
+      formData2.set('image', image)
+
+      const res = await fetch('http://localhost:3005/api/images/posts/upload', {
+        method: 'POST',
+        body: formData2,
+      })
+      const {
+        imageUrl,
+      }: {
+        message: string
+        imageUrl: string
+      } = await res.json()
+
+      const post = await prisma.posts.create({
+        data: {
+          title,
+          description,
+          image_url: imageUrl,
+        },
+      })
+
+
+      return c.json({
+        message: 'Created',
+        post,
+      }) 
+    }
 
     const post = await prisma.posts.create({
       data: {
         title,
-        image_path,
+        description,
       },
     })
 
     return c.json({
       message: 'Created',
-      post,
-    })
-  })
-
-  .put('/:id', async (c) => {
-    const id = c.req.param('id')
-
-    const {
-      title,
-      image_path,
-    } = await c.req.json()
-
-    let post = await prisma.posts.findFirst({
-      where: {
-        id: Number.parseInt(id),
-      },
-    })
-
-    if (!post) {
-      return c.json({
-        message: 'Post not found',
-      }, 404)
-    }
-
-    post = await prisma.posts.update({
-      data: {
-        title,
-        image_path,
-      },
-      where: {
-        id: Number.parseInt(id),
-      },
-    })
-
-    return c.json({
-      message: 'Updated',
       post,
     })
   })

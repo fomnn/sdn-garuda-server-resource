@@ -22,10 +22,11 @@ studentRouter
       })
 
       return c.json({ students })
-    } else if (classId) {
+    }
+    else if (classId) {
       const students = await prisma.students.findMany({
         where: {
-          class_id: Number.parseInt(classId)
+          class_id: Number.parseInt(classId),
         },
       })
 
@@ -40,6 +41,7 @@ studentRouter
   // GET /api/students/:id
   .get('/:id', async (c) => {
     const id = c.req.param('id')
+    const summary = !!c.req.query('summary')
     const student = await prisma.students.findUnique({
       where: {
         id: Number.parseInt(id),
@@ -50,6 +52,84 @@ studentRouter
       return c.json({
         message: 'Student not found',
       }, 404)
+    }
+
+    if (summary) {
+      const today = new Date('2024-06-22')
+
+      const attendance = await prisma.attendances.findFirst({
+        where: {
+          student_id: Number.parseInt(id),
+          date: new Date(today.toISOString().split('T')[0]),
+        },
+      })
+
+      const nameAbbreviation = student.nama
+        .split(' ') // Memisahkan string menjadi array berdasarkan spasi
+        .map(word => word[0].toUpperCase()) // Mengambil huruf pertama dan mengubahnya ke huruf besar
+        .join('')
+
+      const allAttendanceSumByStudentClass = (await prisma.attendances.findMany({
+        where: {
+          class_id: student.class_id,
+        },
+      })).length
+      const presentAttendanceSumByStudentClass = (await prisma.attendances.findMany({
+        where: {
+          class_id: student.class_id,
+          status: 'present',
+        },
+      })).length
+
+      const allStudentGrade = (await prisma.student_grades.findMany({
+        where: {
+          student_id: student.id,
+        },
+      }))
+
+      const totalGrades = allStudentGrade.reduce((sum, item) => sum + Number.parseFloat(item.grade.toString()), 0)
+      const averageOfGrade = totalGrades / allStudentGrade.length
+
+      const averageOfAttendance = allAttendanceSumByStudentClass ? `${((presentAttendanceSumByStudentClass / allAttendanceSumByStudentClass) * 100).toFixed(0)}` : 0
+
+      const dailyAttendance = attendance?.status ?? null
+
+      const allSubjectIdsByStudentClass = (await prisma.subjects.findMany({
+        where: {
+          class_subjects: {
+            some: {
+              class_id: student.class_id,
+            },
+          },
+        },
+      })).map(subject => subject.id)
+
+      const assignmentIds = (await prisma.student_assignments.findMany({
+        where: {
+          subject_id: {
+            in: allSubjectIdsByStudentClass,
+          },
+        },
+      })).map(assignment => assignment.id)
+
+      const sumOfCompleteAssignment = await prisma.student_grades.count({
+        where: {
+          student_id: student.id,
+          student_assignment_id: {
+            in: assignmentIds,
+          },
+        },
+      })
+
+      return c.json({
+        ...student,
+        dailyAttendance,
+        averageOfAttendance,
+        averageOfGrade,
+        sumOfCompleteAssignment,
+        sumOfAssignment: assignmentIds.length,
+        nameAbbreviation,
+      })
     }
 
     return c.json({ student })

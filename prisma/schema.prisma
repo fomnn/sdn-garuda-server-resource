@@ -165,18 +165,10 @@ model student_assignments {
 model posts {
   id         Int      @id @default(autoincrement())
   title      String
-  image_path String?
+  image_url String? @map("image_path")
+  description String
   created_at DateTime @default(now()) @db.Timestamptz()
   updated_at DateTime @updatedAt @db.Timestamptz()
-  post_paragraphs posts_paragraphs[]
-}
-
-model posts_paragraphs {
-  id              Int    @id @default(autoincrement())
-  post_id         Int
-  content         String
-  paragraph_order Int
-  posts posts @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 enum agama {

@@ -3,15 +3,15 @@ import { Hono } from 'hono'
 import { jwt, sign } from 'hono/jwt'
 import { prisma } from '../../prisma/db.js'
 
-type Variables = JwtVariables<{
-  account_id: number
-  role: 'teacher' | 'principal' | 'parent'
-}>
+type Variables = JwtVariables
 
 const authenticationRouter = new Hono<{ Variables: Variables }>()
 
 authenticationRouter
   .use('/verify', jwt({
+    secret: 'secret',
+  }))
+  .use('/superadmin/verify', jwt({
     secret: 'secret',
   }))
 
@@ -200,6 +200,41 @@ authenticationRouter
     }
   })
 
+  .post('/superadmin/login', async (c) => {
+    const {
+      username,
+      password,
+    } = await c.req.json()
+    const exp = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 5
+    const jwtSecret = 'secret'
+
+    const superadmin = await prisma.superadmin.findFirst({
+      where: {
+        username,
+        password,
+      },
+    })
+
+    if (!superadmin) {
+      return c.json({
+        message: 'username or password is incorrect',
+      }, 400)
+    }
+
+    const payload = {
+      superadmin_id: superadmin.id,
+      exp, // Token expires in 5 minutes
+    }
+
+    const token = await sign(payload, jwtSecret)
+
+    return c.json({
+      superadmin,
+      token,
+      message: 'Login as superadmin success',
+    })
+  })
+
   .post('/verify', async (c) => {
     const { account_id } = c.get('jwtPayload')
     const exp = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 5
@@ -245,6 +280,20 @@ authenticationRouter
         token,
       })
     }
+  })
+
+  .post('/superadmin/verify', async (c) => {
+    const { superadmin_id } = c.get('jwtPayload')
+
+    const superadmin = await prisma.superadmin.findFirst({
+      where: {
+        id: superadmin_id,
+      },
+    })
+
+    return c.json({
+      superadmin,
+    })
   })
 
 export default authenticationRouter
