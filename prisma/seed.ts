@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { account_type, attendance_status, jenis_kelamin, parent_student_relationships } from '@prisma/client'
+import { account_type, jenis_kelamin, parent_student_relationships, student_attendance_status } from '@prisma/client'
 import { prisma } from './db.js'
 
 async function main() {
@@ -13,7 +13,7 @@ async function main() {
   await prisma.subjects.deleteMany()
   await prisma.class_subjects.deleteMany()
   await prisma.parents_students.deleteMany()
-  await prisma.attendances.deleteMany()
+  await prisma.student_attendances.deleteMany()
   await prisma.student_assignments.deleteMany()
   await prisma.student_grades.deleteMany()
   await prisma.subject_teachers.deleteMany()
@@ -42,6 +42,14 @@ async function main() {
 
   const teachers = await prisma.teachers.findMany()
   const teacherIds = teachers.map(teacher => teacher.id)
+
+  // seeding data for `teacher attendance`
+  await prisma.teacher_attendances.createMany({
+    data: Array.from({ length: 5 }).fill(null).map(() => ({
+      teacher_id: faker.helpers.arrayElement(teacherIds),
+      date: faker.date.past(),
+    })),
+  })
 
   await prisma.principals.create({
     data: {
@@ -129,9 +137,9 @@ async function main() {
   })
 
   // Seeding data for `attendances`
-  await prisma.attendances.createMany({
+  await prisma.student_attendances.createMany({
     data: Array.from({ length: 5 }).fill(null).map(() => ({
-      status: faker.helpers.enumValue(attendance_status),
+      status: faker.helpers.enumValue(student_attendance_status),
       date: faker.date.past(),
       student_id: faker.helpers.arrayElement(studentIds),
       class_id: faker.helpers.arrayElement(classIds),
