@@ -9,11 +9,13 @@ type Post = Omit<posts, 'id' | 'created_at' | 'updated_at'>
 describe('post API tests', () => {
   const newPost: Post = {
     title: faker.lorem.words(3),
-    image_path: faker.system.filePath(),
+    image_url: faker.system.filePath(),
+    description: faker.lorem.paragraph(),
   }
   const updatedPost: Post = {
     title: faker.lorem.words(3),
-    image_path: faker.system.filePath(),
+    image_url: faker.system.filePath(),
+    description: faker.lorem.paragraph(),
   }
 
   describe('get /api/posts', () => {
