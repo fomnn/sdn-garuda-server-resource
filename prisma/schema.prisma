@@ -17,13 +17,13 @@ model class_subjects {
 }
 
 model classes {
-  id             Int              @id @default(autoincrement())
+  id             Int                   @id @default(autoincrement())
   class_name     String
   teacher_id     Int?
-  attendance     attendances[]
+  attendance     student_attendances[]
   class_subjects class_subjects[]
   students       students[]
-  teachers       teachers?        @relation(fields: [teacher_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  teachers       teachers?             @relation(fields: [teacher_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
 }
 
 model feedbacks {
@@ -92,15 +92,15 @@ model student_grades {
 }
 
 model students {
-  id               Int                @id @default(autoincrement())
+  id               Int                   @id @default(autoincrement())
   nama             String
   jenis_kelamin    jenis_kelamin
-  NISN             String             @unique
+  NISN             String                @unique
   class_id         Int
-  attendance       attendances[]
+  attendance       student_attendances[]
   parents_students parents_students[]
   student_grades   student_grades[]
-  classes          classes            @relation(fields: [class_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  classes          classes               @relation(fields: [class_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model subject_teachers {
@@ -121,28 +121,40 @@ model subjects {
 }
 
 model teachers {
-  id               Int                @id @default(autoincrement())
-  nama             String
-  email            String             @unique
-  jenis_kelamin    jenis_kelamin
-  NIP              String             @unique
-  tanggal_lahir    DateTime?          @db.Date
-  NUPTK            String             @unique
-  classes          classes[]
-  feedbacks        feedbacks[]
-  subject_teachers subject_teachers[]
+  id                  Int                   @id @default(autoincrement())
+  nama                String
+  email               String                @unique
+  jenis_kelamin       jenis_kelamin
+  NIP                 String                @unique
+  tanggal_lahir       DateTime?             @db.Date
+  NUPTK               String                @unique
+  classes             classes[]
+  feedbacks           feedbacks[]
+  subject_teachers    subject_teachers[]
+  teacher_attendances teacher_attendances[]
 }
 
-model attendances {
-  id         Int                @id @default(autoincrement())
+model student_attendances {
+  id         Int                        @id @default(autoincrement())
   student_id Int
   class_id   Int
-  date       DateTime?          @db.Date
-  status     attendance_status?
-  classes    classes            @relation(fields: [class_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  students   students           @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  date       DateTime?                  @db.Date
+  status     student_attendance_status?
+  classes    classes                    @relation(fields: [class_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  students   students                   @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([student_id, class_id, date], map: "attendance_student_id_class_id_date_idx")
+}
+
+model teacher_attendances {
+  id         Int                        @id @default(autoincrement())
+  teacher_id Int
+  arrived_at DateTime?                  @db.Timestamptz
+  date       DateTime                   @db.Date
+  status     teacher_attendance_status?
+  teachers   teachers                   @relation(fields: [teacher_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([teacher_id, date], map: "teacher_attendance_teacher_id_date_idx")
 }
 
 model principals {
@@ -163,12 +175,18 @@ model student_assignments {
 }
 
 model posts {
-  id         Int      @id @default(autoincrement())
-  title      String
-  image_url String? @map("image_path")
+  id          Int      @id @default(autoincrement())
+  title       String
+  image_url   String?  @map("image_path")
   description String
-  created_at DateTime @default(now()) @db.Timestamptz()
-  updated_at DateTime @updatedAt @db.Timestamptz()
+  created_at  DateTime @default(now()) @db.Timestamptz()
+  updated_at  DateTime @updatedAt @db.Timestamptz()
+}
+
+enum teacher_attendance_status {
+  present
+  sick
+  excused
 }
 
 enum agama {
@@ -179,7 +197,7 @@ enum agama {
   Buddha
 }
 
-enum attendance_status {
+enum student_attendance_status {
   present
   absent
   excused
