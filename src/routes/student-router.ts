@@ -121,8 +121,15 @@ studentRouter
         },
       })
 
+      const className = await prisma.classes.findUnique({
+        where: {
+          id: student.class_id,
+        },
+      })
+
       return c.json({
         ...student,
+        className: className?.class_name,
         dailyAttendance,
         averageOfAttendance,
         averageOfGrade,
