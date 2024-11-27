@@ -57,7 +57,7 @@ studentRouter
     if (summary) {
       const today = new Date('2024-06-22')
 
-      const attendance = await prisma.attendances.findFirst({
+      const attendance = await prisma.student_attendances.findFirst({
         where: {
           student_id: Number.parseInt(id),
           date: new Date(today.toISOString().split('T')[0]),
@@ -69,12 +69,12 @@ studentRouter
         .map(word => word[0].toUpperCase()) // Mengambil huruf pertama dan mengubahnya ke huruf besar
         .join('')
 
-      const allAttendanceSumByStudentClass = (await prisma.attendances.findMany({
+      const allAttendanceSumByStudentClass = (await prisma.student_attendances.findMany({
         where: {
           class_id: student.class_id,
         },
       })).length
-      const presentAttendanceSumByStudentClass = (await prisma.attendances.findMany({
+      const presentAttendanceSumByStudentClass = (await prisma.student_attendances.findMany({
         where: {
           class_id: student.class_id,
           status: 'present',
