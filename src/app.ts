@@ -1,7 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import accountRouter from './routes/account-router.js'
-import attendanceRouter from './routes/attendance-router.js'
 import authenticationRouter from './routes/authentication-router.js'
 import classRouter from './routes/class-router.js'
 import feedbackRouter from './routes/feedback-router.js'
@@ -11,9 +10,11 @@ import postRouter from './routes/post-router.js'
 import principalsRouter from './routes/principals-router.js'
 import studentRouter from './routes/student-router.js'
 import StudentAssignmentRouter from './routes/studentAssignment-router.js'
+import studentAttendanceRouter from './routes/studentAttendance-router.js'
 import studentGradeRouter from './routes/studentGrade-router.js'
 import subjectRouter from './routes/subject-router.js'
 import teacherRouter from './routes/teacher-router.js'
+import teacherAttendanceRouter from './routes/teacherAttendance-router.js'
 
 const app = new Hono().basePath('/api')
 
@@ -59,7 +60,7 @@ app.route('/parents', parentRouter)
 app.route('/teachers', teacherRouter)
 app.route('/classes', classRouter)
 app.route('/subjects', subjectRouter)
-app.route('/attendances', attendanceRouter)
+app.route('/attendances', studentAttendanceRouter)
 app.route('/student-assignments', StudentAssignmentRouter)
 app.route('/student-grades', studentGradeRouter)
 app.route('/feedbacks', feedbackRouter)
@@ -67,5 +68,6 @@ app.route('/accounts', accountRouter)
 app.route('/posts', postRouter)
 app.route('/principals', principalsRouter)
 app.route('/parents-students', parentsStudentsRouter)
+app.route('/teacher-attendances', teacherAttendanceRouter)
 
 export default app
