@@ -1,12 +1,16 @@
 import type { teachers } from '@prisma/client'
 import { faker } from '@faker-js/faker'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import app from '../src/app.js'
 
 let createdTeacherId: number
+let teacherId: number
+let newTeacher: Omit<teachers, 'id'>
+let updatedTeacher: Omit<teachers, 'id'>
+let teacherWithSomeDataConflicted: Omit<teachers, 'id'>
 
-describe('teacher API Tests', () => {
-  const newTeacher: Omit<teachers, 'id'> = {
+beforeEach(async () => {
+  newTeacher = {
     nama: faker.person.fullName({ sex: 'female' }),
     jenis_kelamin: 'female',
     NIP: faker.string.numeric(8),
@@ -14,7 +18,7 @@ describe('teacher API Tests', () => {
     email: faker.internet.email(),
     tanggal_lahir: faker.date.anytime(),
   }
-  const updatedTeacher: Omit<teachers, 'id'> = {
+  updatedTeacher = {
     nama: faker.person.fullName({ sex: 'female' }),
     jenis_kelamin: 'female',
     NIP: faker.string.numeric(8),
@@ -22,7 +26,7 @@ describe('teacher API Tests', () => {
     email: faker.internet.email(),
     tanggal_lahir: faker.date.anytime(),
   }
-  const teacherWithSomeDataConflicted: Omit<teachers, 'id'> = {
+  teacherWithSomeDataConflicted = {
     nama: faker.person.fullName({ sex: 'female' }),
     jenis_kelamin: 'female',
     NIP: '12345',
@@ -31,6 +35,12 @@ describe('teacher API Tests', () => {
     tanggal_lahir: faker.date.anytime(),
   }
 
+  const teachers = await app.request('/api/teachers')
+  const teachersArray = await teachers.json()
+  teacherId = teachersArray.teachers[0].id
+})
+
+describe('teacher API Tests', () => {
   describe('get /api/teachers', () => {
     it('should get all teachers', async () => {
       const res = await app.request('/api/teachers')
@@ -43,7 +53,7 @@ describe('teacher API Tests', () => {
 
   describe('get /api/teachers/:id', () => {
     it('should get a teacher', async () => {
-      const res = await app.request('/api/teachers/1')
+      const res = await app.request(`/api/teachers/${teacherId}`)
       expect(res.status).toBe(200)
 
       const body = await res.json()
