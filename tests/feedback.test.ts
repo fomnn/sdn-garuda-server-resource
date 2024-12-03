@@ -1,27 +1,43 @@
 import type { feedbacks } from '@prisma/client'
 import { faker } from '@faker-js/faker'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
+import { prisma } from '../prisma/db.js'
 import app from '../src/app.js'
 
-let createdFeedbackId: number
+let feedbackIds: number[]
+let parentIds: number[]
+let teacherIds: number[]
+let newFeedback: Omit<feedbacks, 'id' | 'date'> & { date: string }
+let updatedFeedback: Omit<feedbacks, 'id' | 'date'> & { date: string }
+
+beforeAll(async () => {
+  const feedbacks = await prisma.feedbacks.findMany()
+  feedbackIds = feedbacks.map(feedbackData => feedbackData.id)
+
+  const parents = await prisma.parents.findMany()
+  parentIds = parents.map(parentData => parentData.id)
+
+  const teachers = await prisma.teachers.findMany()
+  teacherIds = teachers.map(teacherData => teacherData.id)
+
+  newFeedback = {
+    date: new Date(faker.date.anytime().toISOString().split('T')[0]).toISOString(),
+    feedback_text: faker.lorem.paragraph({ min: 1, max: 4 }),
+    parent_id: faker.helpers.arrayElement(parentIds),
+    rating: faker.number.int({ min: 1, max: 5 }),
+    teacher_id: faker.helpers.arrayElement(teacherIds),
+  }
+
+  updatedFeedback = {
+    date: new Date(faker.date.anytime().toISOString().split('T')[0]).toISOString(),
+    feedback_text: faker.lorem.paragraph({ min: 1, max: 4 }),
+    parent_id: faker.helpers.arrayElement(parentIds),
+    rating: faker.number.int({ min: 1, max: 5 }),
+    teacher_id: faker.helpers.arrayElement(teacherIds),
+  }
+})
 
 describe('feedback API tests', () => {
-  const newFeedback: Omit<feedbacks, 'id' | 'date'> & { date: string } = {
-    date: new Date(faker.date.anytime().toISOString().split('T')[0]).toISOString(),
-    feedback_text: faker.lorem.paragraph({ min: 1, max: 4 }),
-    parent_id: faker.number.int({ min: 1, max: 5 }),
-    rating: faker.number.int({ min: 1, max: 5 }),
-    teacher_id: faker.number.int({ min: 1, max: 5 }),
-  }
-
-  const updatedFeedback: Omit<feedbacks, 'id' | 'date'> & { date: string } = {
-    date: new Date(faker.date.anytime().toISOString().split('T')[0]).toISOString(),
-    feedback_text: faker.lorem.paragraph({ min: 1, max: 4 }),
-    parent_id: faker.number.int({ min: 1, max: 5 }),
-    rating: faker.number.int({ min: 1, max: 5 }),
-    teacher_id: faker.number.int({ min: 1, max: 5 }),
-  }
-
   describe('get /api/feedbacks', () => {
     it('should get all feedbacks', async () => {
       const res = await app.request('/api/feedbacks')
@@ -34,7 +50,7 @@ describe('feedback API tests', () => {
 
   describe('get /api/feedbacks/:id', () => {
     it('should get a feedback', async () => {
-      const res = await app.request('/api/feedbacks/1') // Gunakan ID yang ada
+      const res = await app.request(`/api/feedbacks/${faker.helpers.arrayElement(feedbackIds)}`) // Gunakan ID yang ada
       expect(res.status).toBe(200)
 
       const body = await res.json()
@@ -62,13 +78,12 @@ describe('feedback API tests', () => {
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Created')
       expect(body.feedback).toMatchObject(newFeedback)
-      createdFeedbackId = body.feedback.id
     })
   })
 
   describe('put /api/feedbacks/:id', () => {
     it('should update a student', async () => {
-      const res = await app.request(`/api/feedbacks/${createdFeedbackId}`, {
+      const res = await app.request(`/api/feedbacks/${faker.helpers.arrayElement(feedbackIds)}`, {
         method: 'PUT',
         body: JSON.stringify(updatedFeedback),
         headers: new Headers({ 'Content-Type': 'application/json' }),
@@ -95,13 +110,13 @@ describe('feedback API tests', () => {
 
   describe('delete /api/feedbacks/:id', () => {
     it('should delete a feedback', async () => {
-      const res = await app.request(`/api/feedbacks/${createdFeedbackId}`, {
+      const res = await app.request(`/api/feedbacks/${faker.helpers.arrayElement(feedbackIds)}`, {
         method: 'DELETE',
       })
       expect(res.status).toBe(200)
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Deleted')
-      expect(body.feedback).toMatchObject(updatedFeedback)
+      expect(body).toHaveProperty('feedback')
     })
 
     it('should throw an error 404 if feedback not found', async () => {

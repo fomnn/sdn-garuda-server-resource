@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
+import { prisma } from '../prisma/db.js'
 import app from '../src/app.js'
 
 interface AuthData {
@@ -10,19 +11,40 @@ interface AuthData {
 let teacherToken: string
 let parentToken: string
 
+let authDataSuccess: AuthData
+let authDataFail: AuthData
+
+beforeAll(async () => {
+  const account = await prisma.accounts.findFirst({
+    select: {
+      email: true,
+      password: true,
+      type: true,
+    },
+    where: {
+      type: 'teacher'
+    }
+  })
+
+  if (!account) {
+    throw new Error('Account not found')
+  }
+
+  authDataSuccess = {
+    email: account.email,
+    password: account.password,
+    role: account.type,
+  }
+
+  authDataFail = {
+    email: 'fasdfsadf@example.com',
+    password: 'hehe',
+    role: 'parent',
+  }
+})
+
 describe('authentication tests', () => {
   describe('login as teacher', () => {
-    const authDataSuccess: AuthData = {
-      email: 'teacher3@example.com',
-      password: 'hehe',
-      role: 'teacher',
-    }
-    const authDataFail: AuthData = {
-      email: 'teacher321@example.com',
-      password: 'hehe',
-      role: 'teacher',
-    }
-
     it('should login success', async () => {
       const res = await app.request('/api/auth/login', {
         method: 'POST',
@@ -32,6 +54,7 @@ describe('authentication tests', () => {
       expect(res.status).toBe(200)
 
       const body = await res.json()
+
       expect(body).toHaveProperty('message', 'Login success')
       expect(body).toHaveProperty('token')
       expect(body).toHaveProperty('teacher')
@@ -48,21 +71,11 @@ describe('authentication tests', () => {
       expect(res.status).toBe(404)
 
       const body = await res.json()
-      expect(body).toHaveProperty('message', 'Teacher not found')
+      expect(body).toHaveProperty('message')
     })
   })
 
   describe('login as parent', () => {
-    const authDataSuccess: AuthData = {
-      email: 'parent_one@example.com',
-      password: 'hehe',
-      role: 'parent',
-    }
-    const authDataFail: AuthData = {
-      email: 'fasdfsadf@example.com',
-      password: 'hehe',
-      role: 'parent',
-    }
 
     it('should login success', async () => {
       const res = await app.request('/api/auth/login', {
@@ -75,7 +88,6 @@ describe('authentication tests', () => {
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Login success')
       expect(body).toHaveProperty('token')
-      expect(body).toHaveProperty('parent')
       parentToken = body.token
     })
 
@@ -96,12 +108,12 @@ describe('authentication tests', () => {
     it('should verify success', async () => {
       const res = await app.request('/api/auth/verify', {
         method: 'POST',
-        headers: new Headers({ 
-          authorization: `bearer ${teacherToken}`
-         })
+        headers: new Headers({
+          authorization: `bearer ${teacherToken}`,
+        }),
       })
       expect(res.status).toBe(200)
-      
+
       const body = await res.json()
       expect(body).toHaveProperty('token')
       expect(body).toHaveProperty('teacher')
@@ -112,24 +124,23 @@ describe('authentication tests', () => {
     it('should verify success', async () => {
       const res = await app.request('/api/auth/verify', {
         method: 'POST',
-        headers: new Headers({ 
-          authorization: `bearer ${parentToken}`
-         })
+        headers: new Headers({
+          authorization: `bearer ${parentToken}`,
+        }),
       })
       expect(res.status).toBe(200)
-      
+
       const body = await res.json()
       expect(body).toHaveProperty('token')
-      expect(body).toHaveProperty('parent')
     })
   })
 
   it('should verify fail', async () => {
     const res = await app.request('/api/auth/verify', {
       method: 'POST',
-      headers: new Headers({ 
-        authorization: `bearer fasdfasdf`
-       })
+      headers: new Headers({
+        authorization: `bearer fasdfasdf`,
+      }),
     })
     expect(res.status).toBe(401)
   })

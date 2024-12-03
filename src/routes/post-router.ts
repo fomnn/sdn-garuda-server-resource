@@ -79,6 +79,71 @@ postRouter
     })
   })
 
+  .put('/:id', async (c) => {
+    const id = c.req.param('id')
+
+    const formdata = await c.req.formData()
+
+    const image = formdata.get('image') as File
+    const title = formdata.get('title') as string
+    const description = formdata.get('description') as string
+
+    let post = await prisma.posts.findFirst({
+      where: {
+        id: Number.parseInt(id),
+      },
+    })
+
+    if (!post) {
+      return c.json({
+        message: 'Post not found',
+      }, 404)
+    }
+
+    if (image) {
+      const formData2 = new FormData()
+
+      formData2.set('image', image)
+
+      const res = await fetch('http://localhost:3005/api/images/posts/upload', {
+        method: 'POST',
+        body: formData2,
+      })
+      const {
+        imageUrl,
+      }: {
+        message: string
+        imageUrl: string
+      } = await res.json()
+
+      post = await prisma.posts.update({
+        where: {
+          id: Number.parseInt(id),
+        },
+        data: {
+          title,
+          description,
+          image_url: imageUrl,
+        },
+      })
+    } else {
+      post = await prisma.posts.update({
+        where: {
+          id: Number.parseInt(id),
+        },
+        data: {
+          title,
+          description,
+        },
+      })
+    }
+
+    return c.json({
+      message: 'Updated',
+      post,
+    })
+  })
+
   .delete('/:id', async (c) => {
     const id = c.req.param('id')
 

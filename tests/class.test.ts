@@ -1,21 +1,34 @@
 import type { classes } from '@prisma/client'
 import { faker } from '@faker-js/faker'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
+import { prisma } from '../prisma/db.js'
 import app from '../src/app.js'
 
 let createdClassId: number
+let classIds: number[]
+let newClass: Omit<classes, 'id'>
+let updatedClass: Omit<classes, 'id'>
+let teacherIds: number[]
+
+beforeAll(async () => {
+  const classes = await prisma.classes.findMany()
+  classIds = classes.map(classData => classData.id)
+
+  const teachers = await prisma.teachers.findMany()
+  teacherIds = teachers.map(teacherData => teacherData.id)
+
+  newClass = {
+    class_name: faker.lorem.words({ min: 2, max: 4 }),
+    teacher_id: faker.helpers.arrayElement(teacherIds),
+  }
+
+  updatedClass = {
+    class_name: faker.lorem.words({ min: 2, max: 4 }),
+    teacher_id: faker.helpers.arrayElement(teacherIds),
+  }
+})
 
 describe('class API Tests', () => {
-  const newClass: Omit<classes, 'id'> = {
-    class_name: faker.lorem.words({ min: 2, max: 4 }),
-    teacher_id: faker.number.int({ min: 1, max: 4 }),
-  }
-
-  const updatedClass: Omit<classes, 'id'> = {
-    class_name: faker.lorem.words({ min: 2, max: 4 }),
-    teacher_id: faker.number.int({ min: 1, max: 4 }),
-  }
-
   describe('get /api/classes', () => {
     it('should get all classes', async () => {
       const res = await app.request('/api/classes')
@@ -28,7 +41,7 @@ describe('class API Tests', () => {
 
   describe('get /api/classes/:id', () => {
     it('should get a class', async () => {
-      const res = await app.request('/api/classes/1')
+      const res = await app.request(`/api/classes/${faker.helpers.arrayElement(classIds)}`)
       expect(res.status).toBe(200)
 
       const body = await res.json()
@@ -81,7 +94,7 @@ describe('class API Tests', () => {
         headers: new Headers({ 'Content-Type': 'application/json' }),
       })
       expect(res.status).toBe(404)
-      
+
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Class not found')
     })

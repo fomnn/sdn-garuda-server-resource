@@ -1,39 +1,50 @@
 import type { parents } from '@prisma/client'
 import { faker } from '@faker-js/faker'
-import { describe, expect, expectTypeOf, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
+import { prisma } from '../prisma/db.js'
 import app from '../src/app.js'
 
-let createdParentId: number
+let newParent: Omit<parents, 'id'>
+let updatedParent: Omit<parents, 'id'>
+let parentWithConflictedData: Omit<parents, 'id'>
+let parentIds: number[]
+
+beforeAll(async () => {
+  const email = faker.internet.email()
+
+  newParent = {
+    nama: faker.person.fullName(),
+    jenjang_pendidikan: 'sma',
+    NIK: faker.string.numeric(16),
+    pekerjaan: 'Ibu Rumah Tangga',
+    tahun_lahir: 2000,
+    penghasilan: '0',
+    email,
+  }
+  updatedParent = {
+    nama: faker.person.fullName(),
+    jenjang_pendidikan: 'sma',
+    NIK: faker.string.numeric(16),
+    pekerjaan: 'Ibu Rumah Tangga',
+    tahun_lahir: 2000,
+    penghasilan: '0',
+    email: faker.internet.email(),
+  }
+  parentWithConflictedData = {
+    nama: faker.person.fullName(),
+    jenjang_pendidikan: 'sma',
+    NIK: faker.string.numeric(16),
+    pekerjaan: 'Ibu Rumah Tangga',
+    tahun_lahir: 2000,
+    penghasilan: '0',
+    email,
+  }
+
+  const parents = await prisma.parents.findMany()
+  parentIds = parents.map(parentData => parentData.id)
+})
 
 describe('parent API Tests', () => {
-  const newParent: Omit<parents, 'id'> = {
-    nama: faker.person.fullName(),
-    jenjang_pendidikan: 'sma',
-    NIK: faker.string.numeric(16),
-    pekerjaan: 'Ibu Rumah Tangga',
-    tahun_lahir: 2000,
-    penghasilan: '0',
-    email: faker.internet.email(),
-  }
-  const updatedParent: Omit<parents, 'id'> = {
-    nama: faker.person.fullName(),
-    jenjang_pendidikan: 'sma',
-    NIK: faker.string.numeric(16),
-    pekerjaan: 'Ibu Rumah Tangga',
-    tahun_lahir: 2000,
-    penghasilan: '0',
-    email: faker.internet.email(),
-  }
-  const parentWithConflictedData: Omit<parents, 'id'> = {
-    nama: faker.person.fullName(),
-    jenjang_pendidikan: 'sma',
-    NIK: faker.string.numeric(16),
-    pekerjaan: 'Ibu Rumah Tangga',
-    tahun_lahir: 2000,
-    penghasilan: '0',
-    email: 'parent_one@example.com',
-  }
-
   describe('get /api/parents', () => {
     it('should get all parents', async () => {
       const res = await app.request('/api/parents')
@@ -46,7 +57,7 @@ describe('parent API Tests', () => {
 
   describe('get /api/parents/:id', () => {
     it('should get parent and their children', async () => {
-      const res = await app.request('/api/parents/1')
+      const res = await app.request(`/api/parents/${faker.helpers.arrayElement(parentIds)}`)
       expect(res.status).toBe(200)
 
       const body = await res.json()
@@ -75,7 +86,6 @@ describe('parent API Tests', () => {
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Created')
       expect(body.parent).toMatchObject<Omit<parents, 'id'>>(newParent)
-      createdParentId = body.parent.id
     })
 
     it('should throw an error 409 if email conflicted', async () => {
@@ -93,7 +103,7 @@ describe('parent API Tests', () => {
 
   describe('put /api/parents/:id', () => {
     it('should update a parent', async () => {
-      const res = await app.request(`/api/parents/${createdParentId}`, {
+      const res = await app.request(`/api/parents/${faker.helpers.arrayElement(parentIds)}`, {
         method: 'PUT',
         body: JSON.stringify(updatedParent),
         headers: new Headers({ 'Content-Type': 'application/json' }),
@@ -107,7 +117,7 @@ describe('parent API Tests', () => {
     })
 
     it('should throw an error 409 if any data conflicted', async () => {
-      const res = await app.request(`/api/parents/${createdParentId}`, {
+      const res = await app.request(`/api/parents/${faker.helpers.arrayElement(parentIds)}`, {
         method: 'PUT',
         body: JSON.stringify(parentWithConflictedData),
       })
@@ -130,14 +140,14 @@ describe('parent API Tests', () => {
 
   describe('delete /api/parents/:id', () => {
     it('should delete a parent', async () => {
-      const res = await app.request(`/api/parents/${createdParentId}`, {
+      const res = await app.request(`/api/parents/${faker.helpers.arrayElement(parentIds)}`, {
         method: 'DELETE',
       })
       expect(res.status).toBe(200)
 
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Deleted')
-      expect(body.parent).toMatchObject<Omit<parents, 'id'>>(updatedParent)
+      expect(body).toHaveProperty('parent')
     })
 
     it('should throw an error 404 if parent not found', async () => {

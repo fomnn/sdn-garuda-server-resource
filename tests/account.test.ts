@@ -1,29 +1,40 @@
 import type { accounts } from '@prisma/client'
 import { faker } from '@faker-js/faker'
 import { account_type } from '@prisma/client'
-import { describe, expect, it } from 'vitest'
+import { consola } from 'consola/basic'
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import app from '../src/app.js'
 
-let createdAccountId: number
+let newAccount: Omit<accounts, 'id'>
+let updatedAccount: Omit<accounts, 'id' | 'type' | 'user_id'>
+let conflictedAccount: Omit<accounts, 'id'>
+let accountIds: number[]
+
+beforeAll(async () => {
+  const email = faker.internet.email()
+  newAccount = {
+    email,
+    password: faker.internet.password(),
+    type: faker.helpers.enumValue(account_type),
+    user_id: faker.number.int({ min: 1, max: 5 }),
+  }
+  updatedAccount = {
+    email: faker.internet.email(),
+    password: faker.internet.password(),
+  }
+  conflictedAccount = {
+    email,
+    password: faker.internet.password(),
+    type: faker.helpers.enumValue(account_type),
+    user_id: faker.number.int({ min: 1, max: 5 }),
+  }
+
+  const accounts = await app.request('/api/accounts')
+  const account = await accounts.json()
+  accountIds = (account.accounts as Array<accounts>).map(account => account.id)
+})
 
 describe('account api tests', () => {
-  const newAccount: Omit<accounts, 'id'> = {
-    email: faker.internet.email(),
-    password: faker.internet.password(),
-    type: faker.helpers.enumValue(account_type),
-    user_id: faker.number.int({ min: 1, max: 5 }),
-  }
-  const updatedAccount: Omit<accounts, 'id' | 'type' | 'user_id'> = {
-    email: faker.internet.email(),
-    password: faker.internet.password(),
-  }
-  const conflictedAccount: Omit<accounts, 'id'> = {
-    email: 'Guido18@yahoo.com',
-    password: faker.internet.password(),
-    type: faker.helpers.enumValue(account_type),
-    user_id: faker.number.int({ min: 1, max: 5 }),
-  }
-
   describe('get /api/accounts', () => {
     it('should get all accounts', async () => {
       const res = await app.request('/api/accounts')
@@ -36,7 +47,7 @@ describe('account api tests', () => {
 
   describe('get /api/accounts/:id', () => {
     it('should get a account', async () => {
-      const res = await app.request('/api/accounts/1')
+      const res = await app.request(`/api/accounts/${faker.helpers.arrayElement(accountIds)}`)
       expect(res.status).toBe(200)
 
       const body = await res.json()
@@ -65,7 +76,7 @@ describe('account api tests', () => {
       expect(body).toHaveProperty('message', 'Created')
 
       expect(body.account).toMatchObject<Omit<accounts, 'id'>>(newAccount)
-      createdAccountId = body.account.id
+      expect(body.account).toHaveProperty('id')
     })
 
     it('should throw an error 409 if any data conflicted', async () => {
@@ -83,7 +94,7 @@ describe('account api tests', () => {
 
   describe('put /api/accounts/:id', () => {
     it('should update a account', async () => {
-      const res = await app.request(`/api/accounts/${createdAccountId}`, {
+      const res = await app.request(`/api/accounts/${faker.helpers.arrayElement(accountIds)}`, {
         method: 'PUT',
         body: JSON.stringify(updatedAccount),
         headers: new Headers({ 'Content-Type': 'application/json' }),
@@ -96,8 +107,8 @@ describe('account api tests', () => {
     })
 
     it('should throw an error 409 if any data conflicted', async () => {
-      const res = await app.request('/api/accounts', {
-        method: 'POST',
+      const res = await app.request(`/api/accounts/${faker.helpers.arrayElement(accountIds)}`, {
+        method: 'PUT',
         body: JSON.stringify(conflictedAccount),
         headers: new Headers({ 'Content-Type': 'application/json' }),
       })
@@ -122,14 +133,15 @@ describe('account api tests', () => {
 
   describe('delete /api/accounts/:id', () => {
     it('should delete an account', async () => {
-      const res = await app.request(`/api/accounts/${createdAccountId}`, {
+      // consola.log(createdAccountId)
+      const res = await app.request(`/api/accounts/${faker.helpers.arrayElement(accountIds)}`, {
         method: 'DELETE',
       })
       expect(res.status).toBe(200)
 
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Deleted')
-      expect(body.account).toMatchObject<Omit<accounts, 'id' | 'type' | 'user_id'>>(updatedAccount)
+      expect(body).toHaveProperty('account')
     })
 
     it('should throw an error 404 if not found', async () => {

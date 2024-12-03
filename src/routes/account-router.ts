@@ -86,6 +86,18 @@ accountRouter
       }, 404)
     }
 
+    account = await prisma.accounts.findUnique({
+      where: {
+        email,
+      },
+    })
+
+    if (account) {
+      return c.json({
+        message: 'Email already taken, use another email',
+      }, 409)
+    }
+
     account = await prisma.accounts.update({
       where: {
         id: Number.parseInt(id),

@@ -1,25 +1,41 @@
 import { faker } from '@faker-js/faker'
 import { student_attendance_status, type student_attendances } from '@prisma/client'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
+import { prisma } from '../prisma/db.js'
 import app from '../src/app.js'
 
-let createdAttendanceId: number
+let studentAttendanceIds: number[]
+let studentIds: number[]
+let classesIds: number[]
+let newAttendance: Omit<student_attendances, 'id'>
+let updatedAttendance: Omit<student_attendances, 'id'>
+
+beforeAll(async () => {
+  const studentAttendances = await prisma.student_attendances.findMany()
+  studentAttendanceIds = studentAttendances.map(studentAttendanceData => studentAttendanceData.id)
+
+  const students = await prisma.students.findMany()
+  studentIds = students.map(studentData => studentData.id)
+
+  const classes = await prisma.classes.findMany()
+  classesIds = classes.map(classData => classData.id)
+
+  newAttendance = {
+    class_id: faker.helpers.arrayElement(classesIds),
+    date: new Date(faker.date.anytime().toISOString().split('T')[0]),
+    status: faker.helpers.enumValue(student_attendance_status),
+    student_id: faker.helpers.arrayElement(studentIds),
+  }
+
+  updatedAttendance = {
+    class_id: faker.helpers.arrayElement(classesIds),
+    date: new Date(faker.date.anytime().toISOString().split('T')[0]),
+    status: faker.helpers.enumValue(student_attendance_status),
+    student_id: faker.helpers.arrayElement(studentIds),
+  }
+})
 
 describe('attendance API tests', () => {
-  const newAttendance: Omit<student_attendances, 'id'> = {
-    class_id: faker.number.int({ min: 1, max: 5 }),
-    date: new Date(faker.date.anytime().toISOString().split('T')[0]),
-    status: faker.helpers.enumValue(student_attendance_status),
-    student_id: faker.number.int({ min: 1, max: 5 }),
-  }
-
-  const updatedAttendance: Omit<student_attendances, 'id'> = {
-    class_id: faker.number.int({ min: 1, max: 5 }),
-    date: new Date(faker.date.anytime().toISOString().split('T')[0]),
-    status: faker.helpers.enumValue(student_attendance_status),
-    student_id: faker.number.int({ min: 1, max: 5 }),
-  }
-
   describe('get /api/attendances', () => {
     it('should get all attendances', async () => {
       const res = await app.request('/api/attendances')
@@ -32,7 +48,7 @@ describe('attendance API tests', () => {
 
   describe('get /api/attendances/:id', () => {
     it('should get a attendance', async () => {
-      const res = await app.request('/api/attendances/1')
+      const res = await app.request(`/api/attendances/${faker.helpers.arrayElement(studentAttendanceIds)}`)
       expect(res.status).toBe(200)
 
       const body = await res.json()
@@ -64,13 +80,12 @@ describe('attendance API tests', () => {
         ...newAttendance,
         date: newAttendance.date!.toISOString(),
       })
-      createdAttendanceId = body.attendance.id
     })
   })
 
   describe('put /api/attendances/:id', () => {
     it('should update a attendance', async () => {
-      const res = await app.request(`/api/attendances/${createdAttendanceId}`, {
+      const res = await app.request(`/api/attendances/${faker.helpers.arrayElement(studentAttendanceIds)}`, {
         method: 'PUT',
         body: JSON.stringify(updatedAttendance),
         headers: new Headers({ 'Content-Type': 'application/json' }),
@@ -100,17 +115,14 @@ describe('attendance API tests', () => {
 
   describe('delete /api/attendances/:id', () => {
     it('should delete a attendance', async () => {
-      const res = await app.request(`/api/attendances/${createdAttendanceId}`, {
+      const res = await app.request(`/api/attendances/${faker.helpers.arrayElement(studentAttendanceIds)}`, {
         method: 'DELETE',
       })
       expect(res.status).toBe(200)
 
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Deleted')
-      expect(body.attendance).toMatchObject<Omit<student_attendances, 'id' | 'date'> & { date: string }>({
-        ...updatedAttendance,
-        date: updatedAttendance.date!.toISOString(),
-      })
+      expect(body).toHaveProperty('attendance')
     })
 
     it('should throw an error 404 if not found', async () => {

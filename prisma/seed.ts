@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { account_type, jenis_kelamin, parent_student_relationships, student_attendance_status } from '@prisma/client'
+import { jenis_kelamin, parent_student_relationships, student_attendance_status } from '@prisma/client'
 import { prisma } from './db.js'
 
 async function main() {

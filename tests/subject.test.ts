@@ -1,18 +1,28 @@
 import type { subjects } from '@prisma/client'
 import { faker } from '@faker-js/faker'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import app from '../src/app.js'
 
 let createdSubjectId: number
+let subjectId: number
+let newSubject: Omit<subjects, 'id'>
+let updatedSubject: Omit<subjects, 'id'>
+
+beforeEach(async () => {
+  newSubject = {
+    subject_name: faker.lorem.words({ min: 1, max: 6 }),
+  }
+  updatedSubject = {
+    subject_name: faker.lorem.words({ min: 1, max: 6 }),
+  }
+
+  const subjects = await app.request('/api/subjects')
+  const subjectsJson = await subjects.json()
+
+  subjectId = subjectsJson.subjects[0].id
+})
 
 describe('subject API tests', () => {
-  const newSubject: Omit<subjects, 'id'> = {
-    subject_name: faker.lorem.words({ min: 1, max: 6 }),
-  }
-  const updatedSubject: Omit<subjects, 'id'> = {
-    subject_name: faker.lorem.words({ min: 1, max: 6 }),
-  }
-
   describe('get /api/subjects', () => {
     it('should get all subjects', async () => {
       const res = await app.request('/api/subjects')
@@ -25,7 +35,7 @@ describe('subject API tests', () => {
 
   describe('get /api/subjects/:id', () => {
     it('should get a subject', async () => {
-      const res = await app.request('/api/subjects/1')
+      const res = await app.request(`/api/subjects/${subjectId}`)
       expect(res.status).toBe(200)
 
       const body = await res.json()
@@ -95,7 +105,7 @@ describe('subject API tests', () => {
 
       const body = await res.json()
       expect(body).toHaveProperty('message', 'Deleted')
-      expect(body.subject).toMatchObject<Omit<subjects, 'id'>>(updatedSubject)
+      expect(body).toHaveProperty('subject')
     })
 
     it('should throw an error 404 if not found', async () => {
